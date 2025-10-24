@@ -1,78 +1,135 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 
 interface DateFilterProps {
   onFilterChange: (dataInicio: string, dataFim: string) => void;
 }
 
 export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
-  const [selectedPeriod, setSelectedPeriod] = useState<'mes-atual' | 'ultimos-30' | 'ultimos-90' | 'custom'>('mes-atual');
+  const now = new Date();
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: startOfMonth(now),
+    to: endOfMonth(now),
+  });
 
-  const handlePeriodChange = (period: typeof selectedPeriod) => {
-    setSelectedPeriod(period);
+  const handleDateSelect = (newDate: DateRange | undefined) => {
+    setDate(newDate);
     
-    const now = new Date();
-    let dataInicio: Date;
-    let dataFim: Date = now;
+    if (newDate?.from && newDate?.to) {
+      const dataInicio = format(newDate.from, 'dd/MM/yyyy', { locale: ptBR });
+      const dataFim = format(newDate.to, 'dd/MM/yyyy', { locale: ptBR });
+      onFilterChange(dataInicio, dataFim);
+    }
+  };
 
-    switch (period) {
+  const handlePresetClick = (preset: 'mes-atual' | 'ultimos-30' | 'ultimos-90') => {
+    const now = new Date();
+    let from: Date;
+    let to: Date = now;
+
+    switch (preset) {
       case 'mes-atual':
-        dataInicio = startOfMonth(now);
-        dataFim = endOfMonth(now);
+        from = startOfMonth(now);
+        to = endOfMonth(now);
         break;
       case 'ultimos-30':
-        dataInicio = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        from = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         break;
       case 'ultimos-90':
-        dataInicio = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        from = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
         break;
-      default:
-        return;
     }
 
-    // Formatar para DD/MM/YYYY
-    const formatDate = (date: Date) => format(date, 'dd/MM/yyyy', { locale: ptBR });
+    const newDate = { from, to };
+    setDate(newDate);
     
-    onFilterChange(formatDate(dataInicio), formatDate(dataFim));
+    const dataInicio = format(from, 'dd/MM/yyyy', { locale: ptBR });
+    const dataFim = format(to, 'dd/MM/yyyy', { locale: ptBR });
+    onFilterChange(dataInicio, dataFim);
   };
 
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Período:</span>
           </div>
-          
-          <div className="flex flex-wrap gap-2">
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Botões de atalho */}
             <Button
-              variant={selectedPeriod === 'mes-atual' ? 'default' : 'outline'}
+              variant="outline"
               size="sm"
-              onClick={() => handlePeriodChange('mes-atual')}
+              onClick={() => handlePresetClick('mes-atual')}
             >
               Mês Atual
             </Button>
             
             <Button
-              variant={selectedPeriod === 'ultimos-30' ? 'default' : 'outline'}
+              variant="outline"
               size="sm"
-              onClick={() => handlePeriodChange('ultimos-30')}
+              onClick={() => handlePresetClick('ultimos-30')}
             >
               Últimos 30 dias
             </Button>
             
             <Button
-              variant={selectedPeriod === 'ultimos-90' ? 'default' : 'outline'}
+              variant="outline"
               size="sm"
-              onClick={() => handlePeriodChange('ultimos-90')}
+              onClick={() => handlePresetClick('ultimos-90')}
             >
               Últimos 90 dias
             </Button>
+
+            {/* Seletor de calendário */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className={cn(
+                    "justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "dd/MM/yyyy", { locale: ptBR })} -{" "}
+                        {format(date.to, "dd/MM/yyyy", { locale: ptBR })}
+                      </>
+                    ) : (
+                      format(date.from, "dd/MM/yyyy", { locale: ptBR })
+                    )
+                  ) : (
+                    <span>Selecione o período</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="range"
+                  selected={date}
+                  onSelect={handleDateSelect}
+                  numberOfMonths={2}
+                  locale={ptBR}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                  disabled={(date) => date > new Date()}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </CardContent>
