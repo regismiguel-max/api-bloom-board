@@ -20,8 +20,9 @@ Deno.serve(async (req) => {
     const limite = url.searchParams.get('limite');
     const dataInicio = url.searchParams.get('data_inicio');
     const dataFim = url.searchParams.get('data_fim');
+    const statusPedido = url.searchParams.get('status_pedido');
 
-    console.log(`Fetching vendas - Page: ${page}, Limit: ${limit}, Limite: ${limite ?? 'n/a'}, Periodo: ${dataInicio} a ${dataFim}`);
+    console.log(`Fetching vendas - Page: ${page}, Limit: ${limit}, Limite: ${limite ?? 'n/a'}, Periodo: ${dataInicio} a ${dataFim}, Status: ${statusPedido ?? 'todos'}`);
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -40,10 +41,12 @@ Deno.serve(async (req) => {
       apiUrl = `${API_BASE_URL}/vendas?limite=${encodeURIComponent(limite)}`;
       if (dataInicio) apiUrl += `&data_inicio=${encodeURIComponent(dataInicio)}`;
       if (dataFim) apiUrl += `&data_fim=${encodeURIComponent(dataFim)}`;
+      if (statusPedido) apiUrl += `&status_pedido=${encodeURIComponent(statusPedido)}`;
     } else {
       apiUrl = `${API_BASE_URL}/vendas?page=${page}&limit=${limit}`;
       if (dataInicio) apiUrl += `&data_inicio=${encodeURIComponent(dataInicio)}`;
       if (dataFim) apiUrl += `&data_fim=${encodeURIComponent(dataFim)}`;
+      if (statusPedido) apiUrl += `&status_pedido=${encodeURIComponent(statusPedido)}`;
     }
 
     console.log('API URL:', apiUrl);

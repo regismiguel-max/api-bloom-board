@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -10,7 +11,7 @@ import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
 interface DateFilterProps {
-  onFilterChange: (dataInicio: string, dataFim: string) => void;
+  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string) => void;
 }
 
 export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
@@ -19,6 +20,7 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     from: startOfMonth(now),
     to: endOfMonth(now),
   });
+  const [statusPedido, setStatusPedido] = useState<string>("todos");
 
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
@@ -26,7 +28,17 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     if (newDate?.from && newDate?.to) {
       const dataInicio = format(newDate.from, 'yyyy-MM-dd');
       const dataFim = format(newDate.to, 'yyyy-MM-dd');
-      onFilterChange(dataInicio, dataFim);
+      onFilterChange(dataInicio, dataFim, statusPedido !== "todos" ? statusPedido : undefined);
+    }
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    setStatusPedido(newStatus);
+    
+    if (date?.from && date?.to) {
+      const dataInicio = format(date.from, 'yyyy-MM-dd');
+      const dataFim = format(date.to, 'yyyy-MM-dd');
+      onFilterChange(dataInicio, dataFim, newStatus !== "todos" ? newStatus : undefined);
     }
   };
 
@@ -53,19 +65,41 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     
     const dataInicio = format(from, 'yyyy-MM-dd');
     const dataFim = format(to, 'yyyy-MM-dd');
-    onFilterChange(dataInicio, dataFim);
+    onFilterChange(dataInicio, dataFim, statusPedido !== "todos" ? statusPedido : undefined);
   };
 
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2">
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Período:</span>
+        <div className="flex flex-col gap-4">
+          {/* Filtro de Status */}
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Status do Pedido:</span>
+            </div>
+            <Select value={statusPedido} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-full md:w-[200px]">
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="PENDENTE">Pendente</SelectItem>
+                <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
+                <SelectItem value="ENVIADO">Enviado</SelectItem>
+                <SelectItem value="ENTREGUE">Entregue</SelectItem>
+                <SelectItem value="CANCELADO">Cancelado</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Filtro de Data */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Período:</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
             {/* Botões de atalho */}
             <Button
               variant="outline"
@@ -131,6 +165,7 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
               </PopoverContent>
             </Popover>
           </div>
+        </div>
         </div>
       </CardContent>
     </Card>

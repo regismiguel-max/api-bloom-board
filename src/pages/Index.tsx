@@ -21,8 +21,8 @@ import {
 const Index = () => {
   const { toast } = useToast();
   
-  // Estado para os filtros de data
-  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string }>(() => {
+  // Estado para os filtros de data e status
+  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string }>(() => {
     const now = new Date();
     const dataInicio = format(startOfMonth(now), 'yyyy-MM-dd');
     const dataFim = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -95,9 +95,9 @@ const Index = () => {
     return ((totalOrders / totalClientes) * 100).toFixed(2);
   }, [totalOrders, totalClientes]);
 
-  const handleFilterChange = (dataInicio: string, dataFim: string) => {
-    console.log('Filter changed:', { dataInicio, dataFim });
-    setDateFilters({ dataInicio, dataFim });
+  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string) => {
+    console.log('Filter changed:', { dataInicio, dataFim, statusPedido });
+    setDateFilters({ dataInicio, dataFim, statusPedido });
   };
 
   return (
