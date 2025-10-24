@@ -68,7 +68,16 @@ const Index = () => {
     return getRecentOrders(vendas);
   }, [vendas]);
 
-  const totalOrders = vendas?.length || 0;
+  const totalOrders = useMemo(() => {
+    if (!vendas?.length) return 0;
+    // Contar pedidos únicos, não linhas da API
+    const pedidosUnicos = new Set(
+      vendas
+        .map(v => v.PEDIDO || v.id?.toString())
+        .filter(Boolean)
+    );
+    return pedidosUnicos.size;
+  }, [vendas]);
   
   // Calcular clientes únicos das vendas (usando CLIENTE_DOC como identificador)
   const totalClientes = useMemo(() => {

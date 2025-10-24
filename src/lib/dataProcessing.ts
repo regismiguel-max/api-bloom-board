@@ -28,27 +28,52 @@ const parseDate = (dateStr: string | undefined | null): Date | null => {
 
 export const calculateTotalRevenue = (vendas: Venda[]) => {
   if (!vendas || vendas.length === 0) return 0;
-  const total = vendas.reduce((sum, venda) => {
-    const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
-    return sum + Number(valor);
-  }, 0);
+  
+  // Agrupar por número de pedido para evitar duplicatas
+  // (API retorna múltiplas linhas por pedido, uma por produto)
+  const pedidosUnicos = new Map<string, number>();
+  
+  vendas.forEach((venda) => {
+    const pedidoId = venda.PEDIDO || venda.id?.toString() || '';
+    if (!pedidoId) return;
+    
+    // Armazena apenas uma vez o total de cada pedido
+    if (!pedidosUnicos.has(pedidoId)) {
+      const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
+      pedidosUnicos.set(pedidoId, Number(valor));
+    }
+  });
+  
+  // Somar todos os pedidos únicos
+  const total = Array.from(pedidosUnicos.values()).reduce((sum, valor) => sum + valor, 0);
   return total;
 };
 
 export const calculateMonthlyRevenue = (vendas: Venda[]) => {
-  const monthlyData: { [key: string]: number } = {};
+  // Agrupar por pedido primeiro para evitar duplicatas
+  const pedidosUnicos = new Map<string, { valor: number; data: Date | null }>();
   
   vendas.forEach((venda) => {
-    const dateStr = venda.DATA_VENDA || venda.data || venda.date || venda.created_at;
-    const date = parseDate(dateStr);
+    const pedidoId = venda.PEDIDO || venda.id?.toString() || '';
+    if (!pedidoId) return;
     
-    if (!date) return; // Skip invalid dates
+    if (!pedidosUnicos.has(pedidoId)) {
+      const dateStr = venda.DATA_VENDA || venda.data || venda.date || venda.created_at;
+      const date = parseDate(dateStr);
+      const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
+      
+      pedidosUnicos.set(pedidoId, { valor: Number(valor), data: date });
+    }
+  });
+  
+  // Agrupar por mês
+  const monthlyData: { [key: string]: number } = {};
+  
+  pedidosUnicos.forEach(({ valor, data }) => {
+    if (!data) return;
     
-    // Usar format do date-fns com locale pt-BR
-    const monthKey = format(date, 'MMM', { locale: ptBR });
-    const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
-    
-    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + Number(valor);
+    const monthKey = format(data, 'MMM', { locale: ptBR });
+    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + valor;
   });
 
   // Ordenar meses cronologicamente
@@ -57,7 +82,7 @@ export const calculateMonthlyRevenue = (vendas: Venda[]) => {
   return Object.entries(monthlyData)
     .sort(([a], [b]) => monthOrder.indexOf(a.toLowerCase()) - monthOrder.indexOf(b.toLowerCase()))
     .map(([month, revenue]) => ({
-      month: month.charAt(0).toUpperCase() + month.slice(1), // Capitalizar
+      month: month.charAt(0).toUpperCase() + month.slice(1),
       revenue: Math.round(revenue),
     }));
 };
@@ -84,8 +109,22 @@ export const calculateSalesByCategory = (vendas: Venda[]) => {
 export const getRecentOrders = (vendas: Venda[]) => {
   if (!vendas || vendas.length === 0) return [];
   
-  return vendas
-    .slice()
+  // Agrupar por pedido para evitar duplicatas
+  const pedidosMap = new Map<string, Venda>();
+  
+  vendas.forEach((venda) => {
+    const pedidoId = venda.PEDIDO || venda.id?.toString() || '';
+    if (!pedidoId) return;
+    
+    // Armazena apenas a primeira ocorrência de cada pedido
+    if (!pedidosMap.has(pedidoId)) {
+      pedidosMap.set(pedidoId, venda);
+    }
+  });
+  
+  const pedidosUnicos = Array.from(pedidosMap.values());
+  
+  return pedidosUnicos
     .sort((a, b) => {
       const dateStrA = a.DATA_VENDA || a.data || a.date || a.created_at || '';
       const dateStrB = b.DATA_VENDA || b.data || b.date || b.created_at || '';
@@ -93,7 +132,7 @@ export const getRecentOrders = (vendas: Venda[]) => {
       const dateA = parseDate(dateStrA);
       const dateB = parseDate(dateStrB);
       
-      if (!dateA) return 1;  // Move invalid dates to end
+      if (!dateA) return 1;
       if (!dateB) return -1;
       
       return dateB.getTime() - dateA.getTime();
@@ -115,20 +154,27 @@ export const calculatePreviousMonthRevenue = (vendas: Venda[]) => {
   const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
   const previousMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
   
-  const previousMonthRevenue = vendas.reduce((sum, venda) => {
+  // Agrupar por pedido para evitar duplicatas
+  const pedidosUnicos = new Map<string, number>();
+  
+  vendas.forEach((venda) => {
+    const pedidoId = venda.PEDIDO || venda.id?.toString() || '';
+    if (!pedidoId) return;
+    
     const dateStr = venda.DATA_VENDA || venda.data || venda.date || venda.created_at;
     const date = parseDate(dateStr);
     
-    if (!date) return sum;
+    if (!date) return;
       
     if (date.getMonth() === previousMonth && date.getFullYear() === previousMonthYear) {
-      const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
-      return sum + Number(valor);
+      if (!pedidosUnicos.has(pedidoId)) {
+        const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
+        pedidosUnicos.set(pedidoId, Number(valor));
+      }
     }
-    return sum;
-  }, 0);
+  });
   
-  return previousMonthRevenue;
+  return Array.from(pedidosUnicos.values()).reduce((sum, valor) => sum + valor, 0);
 };
 
 export const calculateCurrentMonthRevenue = (vendas: Venda[]) => {
@@ -136,20 +182,27 @@ export const calculateCurrentMonthRevenue = (vendas: Venda[]) => {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-  const currentMonthRevenue = vendas.reduce((sum, venda) => {
+  // Agrupar por pedido para evitar duplicatas
+  const pedidosUnicos = new Map<string, number>();
+  
+  vendas.forEach((venda) => {
+    const pedidoId = venda.PEDIDO || venda.id?.toString() || '';
+    if (!pedidoId) return;
+    
     const dateStr = venda.DATA_VENDA || venda.data || venda.date || venda.created_at;
     const date = parseDate(dateStr);
     
-    if (!date) return sum;
+    if (!date) return;
       
     if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
-      const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
-      return sum + Number(valor);
+      if (!pedidosUnicos.has(pedidoId)) {
+        const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
+        pedidosUnicos.set(pedidoId, Number(valor));
+      }
     }
-    return sum;
-  }, 0);
+  });
   
-  return currentMonthRevenue;
+  return Array.from(pedidosUnicos.values()).reduce((sum, valor) => sum + valor, 0);
 };
 
 export const calculateRevenueChange = (vendas: Venda[]) => {
