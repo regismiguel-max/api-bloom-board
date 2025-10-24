@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-
-const API_BASE_URL = "http://24.152.15.254:8000";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Cliente {
   id?: string | number;
@@ -14,23 +13,13 @@ export const useClientes = () => {
   return useQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
-      const token = import.meta.env.VITE_API_TOKEN;
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
+      const { data, error } = await supabase.functions.invoke('api-clientes');
       
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+      if (error) {
+        console.error('Error fetching clientes:', error);
+        throw new Error(`Failed to fetch clientes: ${error.message}`);
       }
-
-      const response = await fetch(`${API_BASE_URL}/clientes`, {
-        headers,
-      });
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch clientes: ${response.status} ${response.statusText}`);
-      }
-      const data = await response.json();
       return data as Cliente[];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
