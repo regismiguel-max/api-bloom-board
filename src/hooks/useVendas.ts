@@ -37,52 +37,29 @@ interface VendasFilters {
   dataFim?: string;
 }
 
-// Função para buscar todas as páginas recursivamente
+// Função para buscar todas as vendas com filtro de data
 const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
-  const allVendas: Venda[] = [];
-  let page = 1;
-  let hasMore = true;
-  const limit = 100;
+  const queryParams = new URLSearchParams({
+    limite: "0",
+  });
 
-  while (hasMore) {
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-    });
+  if (filters?.dataInicio) queryParams.append("data_inicio", filters.dataInicio);
+  if (filters?.dataFim) queryParams.append("data_fim", filters.dataFim);
 
-    if (filters?.dataInicio) queryParams.append("data_inicio", filters.dataInicio);
-    if (filters?.dataFim) queryParams.append("data_fim", filters.dataFim);
+  const { data, error } = await supabase.functions.invoke(
+    `api-vendas?${queryParams.toString()}`,
+    { method: "GET" }
+  );
 
-    const { data, error } = await supabase.functions.invoke(
-      `api-vendas?${queryParams.toString()}`,
-      { method: "GET" }
-    );
-
-    if (error) {
-      console.error(`Error fetching vendas page ${page}:`, error);
-      throw new Error(`Failed to fetch vendas: ${error.message}`);
-    }
-
-    const vendas = data.vendas || [];
-    allVendas.push(...vendas);
-
-    console.log(
-      `Page ${page}: ${vendas.length} registros (acumulado: ${allVendas.length}). hasMore sinalizado: ${vendas.length === limit}`
-    );
-
-    // Continuar enquanto a página vier cheia (padrão more pages)
-    hasMore = vendas.length === limit;
-    page++;
-
-    // Limite de segurança para evitar loops infinitos
-    if (page > 1000) {
-      console.warn("Reached maximum page limit (1000)");
-      break;
-    }
+  if (error) {
+    console.error("Error fetching vendas:", error);
+    throw new Error(`Failed to fetch vendas: ${error.message}`);
   }
 
-  console.log(`✅ Fetched total: ${allVendas.length} registros`);
-  return allVendas;
+  const vendas = data.vendas || [];
+  console.log(`✅ Fetched total: ${vendas.length} registros`);
+  
+  return vendas;
 };
 
 export const useVendas = (filters?: VendasFilters) => {
