@@ -4,19 +4,31 @@ import { mockVendas } from "@/lib/mockData";
 
 export interface Venda {
   id?: string | number;
+  PEDIDO?: string;
   cliente_id?: string | number;
   customer_id?: string | number;
+  CODIGO_EXP?: number;
+  CLIENTE_NOME?: string;
+  CLIENTE_DOC?: string;
   valor?: number;
   total?: number;
   price?: number;
+  TOTAL_PEDIDO?: number;
   data?: string;
   date?: string;
   created_at?: string;
+  DATA_VENDA?: string;
+  DATA_PEDIDO?: string;
+  DATA_ENTREGA?: string;
   status?: string;
   produto?: string;
   product?: string;
+  NOME_PRODUTO?: string;
   categoria?: string;
   category?: string;
+  PRODUTO_MARCA?: string;
+  VENDEDOR_NOME?: string;
+  QTDE_ITENS_PEDIDO?: number;
   [key: string]: any;
 }
 

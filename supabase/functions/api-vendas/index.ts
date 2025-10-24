@@ -51,10 +51,13 @@ Deno.serve(async (req) => {
     const data = await response.json();
     console.log('Raw API Response:', JSON.stringify(data).substring(0, 500));
     console.log(`Data type: ${typeof data}, isArray: ${Array.isArray(data)}`);
-    console.log(`Successfully fetched ${Array.isArray(data) ? data.length : 0} vendas`);
+    
+    // A API retorna um objeto com { total: X, vendas: [...] }
+    const vendasArray = data.vendas || data.data || (Array.isArray(data) ? data : []);
+    console.log(`Successfully fetched ${Array.isArray(vendasArray) ? vendasArray.length : 0} vendas`);
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(vendasArray),
       { 
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

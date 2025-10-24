@@ -4,11 +4,24 @@ import { mockClientes } from "@/lib/mockData";
 
 export interface Cliente {
   id?: string | number;
+  CODIGO_CLIENTE?: number;
   nome?: string;
   name?: string;
+  NOME_CLIENTE?: string;
   email?: string;
+  CPF_CNPJ?: string;
   telefone?: string;
   phone?: string;
+  CELULAR?: string;
+  ENDERECO?: string;
+  BAIRRO?: string;
+  CIDADE?: string;
+  UF?: string;
+  CEP?: string;
+  DATA_CADASTRO?: string;
+  ULTIMA_COMPRA?: string;
+  TOTAL_COMPRAS?: number;
+  TOTAL_VENDAS?: number;
   [key: string]: any;
 }
 
