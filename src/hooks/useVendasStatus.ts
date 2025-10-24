@@ -1,33 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
+import { Venda } from "./useVendas";
 
-interface StatusResponse {
-  status: string[];
-}
+// Hook para extrair status únicos dos dados de vendas
+export const useVendasStatus = (vendas: Venda[]) => {
+  const statusList = useMemo(() => {
+    if (!vendas || vendas.length === 0) return [];
+    
+    // Extrair STATUS_PEDIDO únicos
+    const statusSet = new Set<string>();
+    vendas.forEach((venda) => {
+      const status = venda.STATUS_PEDIDO || venda.status;
+      if (status && typeof status === 'string') {
+        statusSet.add(status);
+      }
+    });
+    
+    const uniqueStatus = Array.from(statusSet).sort();
+    console.log(`✅ Extracted ${uniqueStatus.length} unique status:`, uniqueStatus);
+    
+    return uniqueStatus;
+  }, [vendas]);
 
-const fetchVendasStatus = async (): Promise<string[]> => {
-  const { data, error } = await supabase.functions.invoke(
-    'api-vendas-status',
-    { method: "GET" }
-  );
-
-  if (error) {
-    console.error("Error fetching vendas status:", error);
-    throw new Error(`Failed to fetch vendas status: ${error.message}`);
-  }
-
-  // Espera que a API retorne { status: ["PENDENTE", "CONFIRMADO", ...] }
-  const statusList = (data as StatusResponse)?.status || [];
-  console.log(`✅ Fetched ${statusList.length} status options`);
-  
   return statusList;
-};
-
-export const useVendasStatus = () => {
-  return useQuery({
-    queryKey: ["vendas-status"],
-    queryFn: fetchVendasStatus,
-    staleTime: 1000 * 60 * 30, // 30 minutes - status não mudam com frequência
-    retry: 2,
-  });
 };

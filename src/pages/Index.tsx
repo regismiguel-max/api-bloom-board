@@ -6,6 +6,7 @@ import { DataTable } from "@/components/DataTable";
 import { DateFilter } from "@/components/DateFilter";
 import { DollarSign, Users, ShoppingCart, TrendingUp } from "lucide-react";
 import { useVendas } from "@/hooks/useVendas";
+import { useVendasStatus } from "@/hooks/useVendasStatus";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useMemo, useState } from "react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
@@ -30,6 +31,7 @@ const Index = () => {
   });
 
   const { data: vendas = [], isLoading: isLoadingVendas, error: errorVendas } = useVendas(dateFilters);
+  const statusList = useVendasStatus(vendas);
 
   useEffect(() => {
     if (errorVendas) {
@@ -112,7 +114,7 @@ const Index = () => {
         </div>
 
         {/* Filtro de Data */}
-        <DateFilter onFilterChange={handleFilterChange} />
+        <DateFilter onFilterChange={handleFilterChange} statusList={statusList} />
 
         {/* KPI Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

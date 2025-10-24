@@ -9,13 +9,13 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
-import { useVendasStatus } from "@/hooks/useVendasStatus";
 
 interface DateFilterProps {
   onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string, tipoCliente?: string) => void;
+  statusList?: string[];
 }
 
-export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
+export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps) => {
   const now = new Date();
   const [date, setDate] = useState<DateRange | undefined>({
     from: startOfMonth(now),
@@ -23,8 +23,6 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
   });
   const [statusPedido, setStatusPedido] = useState<string>("todos");
   const [tipoCliente, setTipoCliente] = useState<string>("todos");
-  
-  const { data: statusList = [], isLoading: isLoadingStatus } = useVendasStatus();
 
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
@@ -111,9 +109,9 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
             {/* Filtro de Status */}
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">Status do Pedido:</span>
-              <Select value={statusPedido} onValueChange={handleStatusChange} disabled={isLoadingStatus}>
+              <Select value={statusPedido} onValueChange={handleStatusChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder={isLoadingStatus ? "Carregando..." : "Selecione o status"} />
+                  <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos</SelectItem>

@@ -21,6 +21,7 @@ export interface Venda {
   DATA_PEDIDO?: string;
   DATA_ENTREGA?: string;
   status?: string;
+  STATUS_PEDIDO?: string;
   produto?: string;
   product?: string;
   NOME_PRODUTO?: string;
