@@ -42,24 +42,24 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
   const allVendas: Venda[] = [];
   let page = 1;
   let hasMore = true;
-  
-  // Construir query params
-  const params: Record<string, string> = {
-    page: page.toString(),
-    limit: '100'
-  };
-  
-  if (filters?.dataInicio) params.data_inicio = filters.dataInicio;
-  if (filters?.dataFim) params.data_fim = filters.dataFim;
+  const limit = 100;
 
   while (hasMore) {
-    params.page = page.toString();
-    
-    console.log(`Fetching vendas page ${page}...`);
-    
-    const { data, error } = await supabase.functions.invoke('api-vendas', {
-      body: params
+    // Construir query string
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
     });
+    
+    if (filters?.dataInicio) queryParams.append('data_inicio', filters.dataInicio);
+    if (filters?.dataFim) queryParams.append('data_fim', filters.dataFim);
+    
+    console.log(`Fetching vendas page ${page} with filters:`, filters);
+    
+    const { data, error } = await supabase.functions.invoke(
+      `api-vendas?${queryParams.toString()}`,
+      { method: 'GET' }
+    );
     
     if (error) {
       console.error(`Error fetching vendas page ${page}:`, error);
@@ -69,14 +69,15 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
     const vendas = data.vendas || [];
     allVendas.push(...vendas);
     
-    console.log(`Page ${page}: ${vendas.length} vendas (Total so far: ${allVendas.length})`);
+    console.log(`Page ${page}: ${vendas.length} vendas (Total so far: ${allVendas.length}, API Total: ${data.total})`);
     
-    hasMore = data.hasMore && vendas.length > 0;
+    // Continuar se ainda tem mais dados
+    hasMore = data.hasMore && vendas.length === limit;
     page++;
     
     // Limite de segurança para evitar loops infinitos
-    if (page > 50) {
-      console.warn('Reached maximum page limit (50)');
+    if (page > 100) {
+      console.warn('Reached maximum page limit (100)');
       break;
     }
   }
