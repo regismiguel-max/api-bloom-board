@@ -12,8 +12,15 @@ Deno.serve(async (req) => {
   try {
     const API_BASE_URL = "http://24.152.15.254:8000";
     const API_TOKEN = Deno.env.get('API_TOKEN');
+    
+    // Parse query parameters from URL
+    const url = new URL(req.url);
+    const page = url.searchParams.get('page') || '1';
+    const limit = url.searchParams.get('limit') || '100';
+    const dataInicio = url.searchParams.get('data_inicio');
+    const dataFim = url.searchParams.get('data_fim');
 
-    console.log('Fetching vendas data...');
+    console.log(`Fetching vendas - Page: ${page}, Limit: ${limit}, Periodo: ${dataInicio} a ${dataFim}`);
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -26,7 +33,14 @@ Deno.serve(async (req) => {
       console.warn('API_TOKEN not found in environment');
     }
 
-    const response = await fetch(`${API_BASE_URL}/vendas`, {
+    // Construir URL com query params
+    let apiUrl = `${API_BASE_URL}/vendas?page=${page}&limit=${limit}`;
+    if (dataInicio) apiUrl += `&data_inicio=${dataInicio}`;
+    if (dataFim) apiUrl += `&data_fim=${dataFim}`;
+
+    console.log('API URL:', apiUrl);
+
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers,
     });
@@ -54,10 +68,19 @@ Deno.serve(async (req) => {
     
     // A API retorna um objeto com { total: X, vendas: [...] }
     const vendasArray = data.vendas || data.data || (Array.isArray(data) ? data : []);
-    console.log(`Successfully fetched ${Array.isArray(vendasArray) ? vendasArray.length : 0} vendas`);
+    const total = data.total || vendasArray.length;
+    
+    console.log(`Successfully fetched ${vendasArray.length} vendas (Total: ${total})`);
 
+    // Retornar com metadados de paginação
     return new Response(
-      JSON.stringify(vendasArray),
+      JSON.stringify({
+        vendas: vendasArray,
+        total: total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        hasMore: vendasArray.length === parseInt(limit)
+      }),
       { 
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

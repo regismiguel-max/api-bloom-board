@@ -3,11 +3,14 @@ import { KPICard } from "@/components/KPICard";
 import { RevenueChart } from "@/components/RevenueChart";
 import { SalesChart } from "@/components/SalesChart";
 import { DataTable } from "@/components/DataTable";
+import { DateFilter } from "@/components/DateFilter";
 import { DollarSign, Users, ShoppingCart, TrendingUp } from "lucide-react";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { format, startOfMonth, endOfMonth } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   calculateTotalRevenue,
   calculateMonthlyRevenue,
@@ -17,9 +20,18 @@ import {
 } from "@/lib/dataProcessing";
 
 const Index = () => {
-  const { data: vendas = [], isLoading: isLoadingVendas, error: errorVendas } = useVendas();
-  const { data: clientes = [], isLoading: isLoadingClientes, error: errorClientes } = useClientes();
   const { toast } = useToast();
+  const { data: clientes = [], isLoading: isLoadingClientes, error: errorClientes } = useClientes();
+  
+  // Estado para os filtros de data
+  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string }>(() => {
+    const now = new Date();
+    const dataInicio = format(startOfMonth(now), 'dd/MM/yyyy', { locale: ptBR });
+    const dataFim = format(endOfMonth(now), 'dd/MM/yyyy', { locale: ptBR });
+    return { dataInicio, dataFim };
+  });
+
+  const { data: vendas = [], isLoading: isLoadingVendas, error: errorVendas } = useVendas(dateFilters);
 
   useEffect(() => {
     if (errorVendas) {
@@ -73,6 +85,11 @@ const Index = () => {
     return ((totalOrders / totalClientes) * 100).toFixed(2);
   }, [totalOrders, totalClientes]);
 
+  const handleFilterChange = (dataInicio: string, dataFim: string) => {
+    console.log('Filter changed:', { dataInicio, dataFim });
+    setDateFilters({ dataInicio, dataFim });
+  };
+
   return (
     <div className="flex min-h-screen">
       <DashboardNav />
@@ -83,6 +100,9 @@ const Index = () => {
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Dados em tempo real da sua operação.</p>
         </div>
+
+        {/* Filtro de Data */}
+        <DateFilter onFilterChange={handleFilterChange} />
 
         {/* KPI Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -104,8 +124,8 @@ const Index = () => {
             icon={ShoppingCart}
           />
           <KPICard
-            title="Taxa de Conversão"
-            value={`${conversionRate}%`}
+            title="Ticket Médio"
+            value={`R$ ${totalOrders > 0 ? (totalRevenue / totalOrders).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0,00"}`}
             icon={TrendingUp}
           />
         </div>
@@ -116,6 +136,7 @@ const Index = () => {
           <SalesChart data={salesByCategoryData} isLoading={isLoading} />
         </div>
 
+        {/* Data Table */}
         <div className="grid gap-6 lg:grid-cols-3">
           <DataTable orders={recentOrders} isLoading={isLoading} />
         </div>
