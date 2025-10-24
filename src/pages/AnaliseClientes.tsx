@@ -1,13 +1,23 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DateFilter } from "@/components/DateFilter";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
-import { useMemo } from "react";
+import { useVendasStatus } from "@/hooks/useVendasStatus";
+import { useMemo, useState } from "react";
 import { Loader2, TrendingUp, MapPin, Users } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 
 const AnaliseClientes = () => {
-  const { data: vendas = [], isLoading: isLoadingVendas } = useVendas();
+  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string[]; tipoCliente?: string; nomeGrupo?: string }>(() => {
+    const now = new Date();
+    const dataInicio = format(startOfMonth(now), 'yyyy-MM-dd');
+    const dataFim = format(endOfMonth(now), 'yyyy-MM-dd');
+    return { dataInicio, dataFim };
+  });
+
+  const { data: vendas = [], isLoading: isLoadingVendas } = useVendas(dateFilters);
   const { data: clientes = [], isLoading: isLoadingClientes } = useClientes();
 
   const isLoading = isLoadingVendas || isLoadingClientes;
@@ -24,44 +34,92 @@ const AnaliseClientes = () => {
     return map;
   }, [clientes]);
 
-  // Ranking de clientes por vendas com status OK
-  const rankingClientes = useMemo(() => {
-    if (!vendas.length) return [];
-
-    // Filtrar apenas vendas com status OK
-    const vendasOK = vendas.filter(v => v.STATUS_PEDIDO === 'OK');
-
-    // Agrupar por cliente e calcular total
-    const clienteVendas = new Map<string, { nome: string; total: number; uf: string }>();
-
-    vendasOK.forEach((venda) => {
+  // Enriquecer vendas com dados dos clientes
+  const vendasEnriquecidas = useMemo(() => {
+    return vendas.map((venda) => {
       const clienteDoc = venda.CLIENTE_DOC?.replace(/\D/g, '');
       const cliente = clienteDoc ? clientesMap.get(clienteDoc) : null;
+      
+      return {
+        ...venda,
+        CLIENTE_UF: cliente?.UF || 'N/A',
+      };
+    });
+  }, [vendas, clientesMap]);
+
+  const statusList = useVendasStatus(vendasEnriquecidas);
+  
+  const gruposClientes = useMemo(() => {
+    const grupos = new Set<string>();
+    clientes.forEach((cliente) => {
+      if (cliente.NOME_GRUPO) {
+        grupos.add(cliente.NOME_GRUPO);
+      }
+    });
+    return Array.from(grupos).sort();
+  }, [clientes]);
+
+  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string) => {
+    setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente, nomeGrupo });
+  };
+
+  // Ranking de clientes por vendas com status OK
+  const rankingClientes = useMemo(() => {
+    if (!vendasEnriquecidas.length) return [];
+
+    console.log(`🔍 Analisando ${vendasEnriquecidas.length} vendas para ranking`);
+
+    // Filtrar apenas vendas com status OK
+    const vendasOK = vendasEnriquecidas.filter(v => v.STATUS_PEDIDO === 'OK');
+    console.log(`✅ Vendas com status OK: ${vendasOK.length}`);
+
+    // Agrupar por PEDIDO primeiro para pegar o total correto
+    const pedidosUnicos = new Map<string, any>();
+    vendasOK.forEach((venda) => {
+      const pedidoId = venda.PEDIDO || venda.id?.toString();
+      if (pedidoId && !pedidosUnicos.has(pedidoId)) {
+        pedidosUnicos.set(pedidoId, venda);
+      }
+    });
+
+    // Agrupar por cliente
+    const clienteVendas = new Map<string, { nome: string; total: number; uf: string; pedidos: number }>();
+
+    pedidosUnicos.forEach((venda) => {
+      const clienteDoc = venda.CLIENTE_DOC?.replace(/\D/g, '');
       
       if (clienteDoc) {
         const key = clienteDoc;
         const existing = clienteVendas.get(key) || { 
           nome: venda.CLIENTE_NOME || 'Cliente Desconhecido', 
           total: 0,
-          uf: cliente?.UF || 'N/A'
+          uf: venda.CLIENTE_UF || 'N/A',
+          pedidos: 0
         };
         
         existing.total += venda.TOTAL_PEDIDO || 0;
+        existing.pedidos += 1;
         clienteVendas.set(key, existing);
       }
     });
 
+    console.log(`👥 Total de clientes únicos: ${clienteVendas.size}`);
+
     // Converter para array e ordenar por total
-    return Array.from(clienteVendas.entries())
+    const resultado = Array.from(clienteVendas.entries())
       .map(([doc, data]) => ({
         doc,
         nome: data.nome,
         total: data.total,
-        uf: data.uf
+        uf: data.uf,
+        pedidos: data.pedidos
       }))
       .sort((a, b) => b.total - a.total)
       .slice(0, 10); // Top 10
-  }, [vendas, clientesMap]);
+
+    console.log(`🏆 Top 10 clientes:`, resultado);
+    return resultado;
+  }, [vendasEnriquecidas]);
 
   // Distribuição por UF
   const distribuicaoPorUF = useMemo(() => {
@@ -82,13 +140,13 @@ const AnaliseClientes = () => {
 
   const totalClientesAtivos = useMemo(() => {
     const clientesComVendas = new Set(
-      vendas
+      vendasEnriquecidas
         .filter(v => v.STATUS_PEDIDO === 'OK')
         .map(v => v.CLIENTE_DOC?.replace(/\D/g, ''))
         .filter(Boolean)
     );
     return clientesComVendas.size;
-  }, [vendas]);
+  }, [vendasEnriquecidas]);
 
   const COLORS = [
     'hsl(var(--primary))',
@@ -108,6 +166,9 @@ const AnaliseClientes = () => {
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Análise de Clientes</h1>
           <p className="text-muted-foreground">Ranking e distribuição geográfica dos clientes.</p>
         </div>
+
+        {/* Filtro de Data */}
+        <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} />
 
         {/* Loading overlay */}
         {isLoading && (
@@ -171,7 +232,7 @@ const AnaliseClientes = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{cliente.nome}</p>
-                          <p className="text-xs text-muted-foreground">{cliente.uf}</p>
+                          <p className="text-xs text-muted-foreground">{cliente.uf} • {cliente.pedidos} pedidos</p>
                         </div>
                       </div>
                       <p className="font-bold text-primary whitespace-nowrap ml-2">
