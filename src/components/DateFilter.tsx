@@ -24,8 +24,8 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     setDate(newDate);
     
     if (newDate?.from && newDate?.to) {
-      const dataInicio = format(newDate.from, 'dd/MM/yyyy', { locale: ptBR });
-      const dataFim = format(newDate.to, 'dd/MM/yyyy', { locale: ptBR });
+      const dataInicio = format(newDate.from, 'yyyy-MM-dd');
+      const dataFim = format(newDate.to, 'yyyy-MM-dd');
       onFilterChange(dataInicio, dataFim);
     }
   };
@@ -51,8 +51,8 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     const newDate = { from, to };
     setDate(newDate);
     
-    const dataInicio = format(from, 'dd/MM/yyyy', { locale: ptBR });
-    const dataFim = format(to, 'dd/MM/yyyy', { locale: ptBR });
+    const dataInicio = format(from, 'yyyy-MM-dd');
+    const dataFim = format(to, 'yyyy-MM-dd');
     onFilterChange(dataInicio, dataFim);
   };
 

@@ -24,8 +24,8 @@ const Index = () => {
   // Estado para os filtros de data
   const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string }>(() => {
     const now = new Date();
-    const dataInicio = format(startOfMonth(now), 'dd/MM/yyyy', { locale: ptBR });
-    const dataFim = format(endOfMonth(now), 'dd/MM/yyyy', { locale: ptBR });
+    const dataInicio = format(startOfMonth(now), 'yyyy-MM-dd');
+    const dataFim = format(endOfMonth(now), 'yyyy-MM-dd');
     return { dataInicio, dataFim };
   });
 
