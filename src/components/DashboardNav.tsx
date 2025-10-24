@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { icon: BarChart3, label: "Dashboard", active: true },
+  { icon: BarChart3, label: "Pedido x Venda", active: true },
   { icon: TrendingUp, label: "Análises", active: false },
   { icon: Users, label: "Usuários", active: false },
   { icon: ShoppingCart, label: "Vendas", active: false },
