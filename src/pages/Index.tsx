@@ -4,7 +4,7 @@ import { RevenueChart } from "@/components/RevenueChart";
 import { SalesChart } from "@/components/SalesChart";
 import { DataTable } from "@/components/DataTable";
 import { DateFilter } from "@/components/DateFilter";
-import { DollarSign, Users, ShoppingCart, TrendingUp } from "lucide-react";
+import { DollarSign, Users, ShoppingCart, TrendingUp, Loader2 } from "lucide-react";
 import { useVendas } from "@/hooks/useVendas";
 import { useVendasStatus } from "@/hooks/useVendasStatus";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +29,8 @@ const Index = () => {
     const dataFim = format(endOfMonth(now), 'yyyy-MM-dd');
     return { dataInicio, dataFim };
   });
+  
+  const [isFiltering, setIsFiltering] = useState(false);
 
   const { data: vendas = [], isLoading: isLoadingVendas, error: errorVendas } = useVendas(dateFilters);
   const statusList = useVendasStatus(vendas);
@@ -69,7 +71,12 @@ const Index = () => {
 
   useEffect(() => {
     console.log(`📊 Total vendas API: ${vendas.length}, Filtradas: ${vendasFiltradas.length}`);
-  }, [vendas.length, vendasFiltradas.length]);
+    // Remover loading após dados filtrados
+    if (isFiltering) {
+      const timer = setTimeout(() => setIsFiltering(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [vendas.length, vendasFiltradas.length, isFiltering]);
 
   useEffect(() => {
     if (errorVendas) {
@@ -137,6 +144,7 @@ const Index = () => {
 
   const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string, tipoCliente?: string) => {
     console.log('Filter changed:', { dataInicio, dataFim, statusPedido, tipoCliente });
+    setIsFiltering(true);
     setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente });
   };
 
@@ -153,6 +161,16 @@ const Index = () => {
 
         {/* Filtro de Data */}
         <DateFilter onFilterChange={handleFilterChange} statusList={statusList} />
+
+        {/* Loading overlay */}
+        {(isLoading || isFiltering) && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Carregando dados...</p>
+            </div>
+          </div>
+        )}
 
         {/* KPI Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
