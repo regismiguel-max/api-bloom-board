@@ -3,8 +3,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { useState, useMemo } from "react";
+
+interface OrderItem {
+  produto: string;
+  marca: string;
+  vendedor: string;
+}
 
 interface Order {
   id: string;
@@ -12,6 +19,7 @@ interface Order {
   amount: number;
   status: string;
   totalItems: number;
+  items: OrderItem[];
 }
 
 interface DataTableProps {
@@ -92,6 +100,7 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
               <TableHead>Valor</TableHead>
               <TableHead>Total de Itens</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-center">Detalhes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -110,6 +119,60 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
                   <Badge variant="outline" className={getStatusColor(order.status)}>
                     {order.status}
                   </Badge>
+                </TableCell>
+                <TableCell className="text-center">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Detalhes do Pedido {order.id}</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 mt-4">
+                        <div className="grid grid-cols-2 gap-4 pb-4 border-b">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Cliente</p>
+                            <p className="font-medium">{order.customer}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Total</p>
+                            <p className="font-medium">
+                              {new Intl.NumberFormat('pt-BR', { 
+                                style: 'currency', 
+                                currency: 'BRL' 
+                              }).format(order.amount)}
+                            </p>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold mb-3">Produtos ({order.items.length})</h4>
+                          <div className="space-y-3">
+                            {order.items.map((item, idx) => (
+                              <div key={idx} className="p-3 rounded-lg border bg-card">
+                                <div className="grid gap-2">
+                                  <div>
+                                    <span className="text-sm text-muted-foreground">Produto: </span>
+                                    <span className="font-medium">{item.produto}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm text-muted-foreground">Marca: </span>
+                                    <span>{item.marca}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm text-muted-foreground">Vendedor: </span>
+                                    <span>{item.vendedor}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </TableCell>
               </TableRow>
             ))}

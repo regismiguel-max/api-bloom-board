@@ -119,24 +119,29 @@ export const calculateSalesByCategory = (vendas: Venda[]) => {
 export const getRecentOrders = (vendas: Venda[]) => {
   if (!vendas || vendas.length === 0) return [];
   
-  // Agrupar por pedido
-  const pedidosMap = new Map<string, Venda>();
+  // Agrupar por pedido e coletar todos os itens
+  const pedidosMap = new Map<string, Venda[]>();
   
   vendas.forEach((venda) => {
     const pedidoId = venda.PEDIDO || venda.id?.toString() || '';
     if (!pedidoId) return;
 
     if (!pedidosMap.has(pedidoId)) {
-      pedidosMap.set(pedidoId, venda);
+      pedidosMap.set(pedidoId, []);
     }
+    pedidosMap.get(pedidoId)!.push(venda);
   });
   
-  const pedidosUnicos = Array.from(pedidosMap.values());
+  const pedidosUnicos = Array.from(pedidosMap.entries()).map(([pedidoId, items]) => ({
+    pedidoId,
+    items,
+    firstItem: items[0]
+  }));
   
   return pedidosUnicos
     .sort((a, b) => {
-      const dateStrA = a.DATA_VENDA || a.data || a.date || a.created_at || '';
-      const dateStrB = b.DATA_VENDA || b.data || b.date || b.created_at || '';
+      const dateStrA = a.firstItem.DATA_VENDA || a.firstItem.data || a.firstItem.date || a.firstItem.created_at || '';
+      const dateStrB = b.firstItem.DATA_VENDA || b.firstItem.data || b.firstItem.date || b.firstItem.created_at || '';
       
       const dateA = parseDate(dateStrA);
       const dateB = parseDate(dateStrB);
@@ -146,15 +151,19 @@ export const getRecentOrders = (vendas: Venda[]) => {
       
       return dateB.getTime() - dateA.getTime();
     })
-    .map((venda) => {
-      const pedidoId = (venda.PEDIDO || venda.id)?.toString() || "N/A";
-      const totalPedido = getTotalPedido(venda);
+    .map(({ pedidoId, items, firstItem }) => {
+      const totalPedido = getTotalPedido(firstItem);
       return {
         id: pedidoId,
-        customer: venda.CLIENTE_NOME || "Cliente Desconhecido",
+        customer: firstItem.CLIENTE_NOME || "Cliente Desconhecido",
         amount: totalPedido,
-        status: venda.STATUS_PEDIDO || venda.status || "Sem Status",
-        totalItems: venda.QTDE_ITENS_PEDIDO || 0,
+        status: firstItem.STATUS_PEDIDO || firstItem.status || "Sem Status",
+        totalItems: firstItem.QTDE_ITENS_PEDIDO || items.length,
+        items: items.map(item => ({
+          produto: item.NOME_PRODUTO || item.produto || "Produto não informado",
+          marca: item.PRODUTO_MARCA || "Marca não informada",
+          vendedor: item.VENDEDOR_NOME || "Vendedor não informado"
+        }))
       };
     });
 };
