@@ -36,6 +36,7 @@ interface VendasFilters {
   dataInicio?: string;
   dataFim?: string;
   statusPedido?: string;
+  tipoCliente?: string;
 }
 
 // Função para buscar todas as vendas com filtro de data
@@ -47,6 +48,7 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
   if (filters?.dataInicio) queryParams.append("data_inicio", filters.dataInicio);
   if (filters?.dataFim) queryParams.append("data_fim", filters.dataFim);
   if (filters?.statusPedido) queryParams.append("status_pedido", filters.statusPedido);
+  if (filters?.tipoCliente) queryParams.append("tipo_cliente", filters.tipoCliente);
 
   const { data, error } = await supabase.functions.invoke(
     `api-vendas?${queryParams.toString()}`,

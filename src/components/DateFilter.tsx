@@ -11,7 +11,7 @@ import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
 interface DateFilterProps {
-  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string) => void;
+  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string, tipoCliente?: string) => void;
 }
 
 export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
@@ -21,6 +21,7 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     to: endOfMonth(now),
   });
   const [statusPedido, setStatusPedido] = useState<string>("todos");
+  const [tipoCliente, setTipoCliente] = useState<string>("todos");
 
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
@@ -28,7 +29,12 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     if (newDate?.from && newDate?.to) {
       const dataInicio = format(newDate.from, 'yyyy-MM-dd');
       const dataFim = format(newDate.to, 'yyyy-MM-dd');
-      onFilterChange(dataInicio, dataFim, statusPedido !== "todos" ? statusPedido : undefined);
+      onFilterChange(
+        dataInicio, 
+        dataFim, 
+        statusPedido !== "todos" ? statusPedido : undefined,
+        tipoCliente !== "todos" ? tipoCliente : undefined
+      );
     }
   };
 
@@ -38,7 +44,27 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     if (date?.from && date?.to) {
       const dataInicio = format(date.from, 'yyyy-MM-dd');
       const dataFim = format(date.to, 'yyyy-MM-dd');
-      onFilterChange(dataInicio, dataFim, newStatus !== "todos" ? newStatus : undefined);
+      onFilterChange(
+        dataInicio, 
+        dataFim, 
+        newStatus !== "todos" ? newStatus : undefined,
+        tipoCliente !== "todos" ? tipoCliente : undefined
+      );
+    }
+  };
+
+  const handleTipoClienteChange = (newTipo: string) => {
+    setTipoCliente(newTipo);
+    
+    if (date?.from && date?.to) {
+      const dataInicio = format(date.from, 'yyyy-MM-dd');
+      const dataFim = format(date.to, 'yyyy-MM-dd');
+      onFilterChange(
+        dataInicio, 
+        dataFim, 
+        statusPedido !== "todos" ? statusPedido : undefined,
+        newTipo !== "todos" ? newTipo : undefined
+      );
     }
   };
 
@@ -65,31 +91,52 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
     
     const dataInicio = format(from, 'yyyy-MM-dd');
     const dataFim = format(to, 'yyyy-MM-dd');
-    onFilterChange(dataInicio, dataFim, statusPedido !== "todos" ? statusPedido : undefined);
+    onFilterChange(
+      dataInicio, 
+      dataFim, 
+      statusPedido !== "todos" ? statusPedido : undefined,
+      tipoCliente !== "todos" ? tipoCliente : undefined
+    );
   };
 
   return (
     <Card>
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
-          {/* Filtro de Status */}
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-2">
+          {/* Filtros em linha */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Filtro de Status */}
+            <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">Status do Pedido:</span>
+              <Select value={statusPedido} onValueChange={handleStatusChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="PENDENTE">Pendente</SelectItem>
+                  <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
+                  <SelectItem value="ENVIADO">Enviado</SelectItem>
+                  <SelectItem value="ENTREGUE">Entregue</SelectItem>
+                  <SelectItem value="CANCELADO">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={statusPedido} onValueChange={handleStatusChange}>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Selecione o status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="PENDENTE">Pendente</SelectItem>
-                <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
-                <SelectItem value="ENVIADO">Enviado</SelectItem>
-                <SelectItem value="ENTREGUE">Entregue</SelectItem>
-                <SelectItem value="CANCELADO">Cancelado</SelectItem>
-              </SelectContent>
-            </Select>
+
+            {/* Filtro de Tipo de Cliente */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">Tipo de Cliente:</span>
+              <Select value={tipoCliente} onValueChange={handleTipoClienteChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="pf">Pessoa Física (CPF)</SelectItem>
+                  <SelectItem value="pj">Pessoa Jurídica (CNPJ)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Filtro de Data */}
