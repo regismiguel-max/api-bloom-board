@@ -108,7 +108,7 @@ const Index = () => {
         {/* KPI Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <KPICard
-            title="Receita Total"
+            title="Receita do Período"
             value={`R$ ${(totalRevenue || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             change={revenueChange}
             trend={revenueChange >= 0 ? "up" : "down"}
@@ -120,7 +120,7 @@ const Index = () => {
             icon={Users}
           />
           <KPICard
-            title="Total de Vendas"
+            title="Vendas do Período"
             value={(totalOrders || 0).toLocaleString("pt-BR")}
             icon={ShoppingCart}
           />
