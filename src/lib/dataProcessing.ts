@@ -1,0 +1,111 @@
+import { Venda } from "@/hooks/useVendas";
+import { Cliente } from "@/hooks/useClientes";
+
+export const calculateTotalRevenue = (vendas: Venda[]) => {
+  const total = vendas.reduce((sum, venda) => {
+    const valor = venda.valor || venda.total || venda.price || 0;
+    return sum + Number(valor);
+  }, 0);
+  return total;
+};
+
+export const calculateMonthlyRevenue = (vendas: Venda[]) => {
+  const monthlyData: { [key: string]: number } = {};
+  
+  vendas.forEach((venda) => {
+    const date = new Date(venda.data || venda.date || venda.created_at || Date.now());
+    const monthKey = date.toLocaleDateString("pt-BR", { month: "short" });
+    const valor = venda.valor || venda.total || venda.price || 0;
+    
+    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + Number(valor);
+  });
+
+  return Object.entries(monthlyData).map(([month, revenue]) => ({
+    month,
+    revenue: Math.round(revenue),
+  }));
+};
+
+export const calculateSalesByCategory = (vendas: Venda[]) => {
+  const categoryData: { [key: string]: number } = {};
+  
+  vendas.forEach((venda) => {
+    const category = venda.categoria || venda.category || venda.produto || "Outros";
+    const valor = venda.valor || venda.total || venda.price || 1;
+    
+    categoryData[category] = (categoryData[category] || 0) + Number(valor);
+  });
+
+  return Object.entries(categoryData)
+    .map(([category, sales]) => ({
+      category,
+      sales: Math.round(sales),
+    }))
+    .sort((a, b) => b.sales - a.sales)
+    .slice(0, 6);
+};
+
+export const getRecentOrders = (vendas: Venda[], clientes: Cliente[]) => {
+  const clienteMap = new Map(clientes.map((c) => [c.id, c.nome || c.name || "Cliente"]));
+  
+  return vendas
+    .slice()
+    .sort((a, b) => {
+      const dateA = new Date(a.data || a.date || a.created_at || 0);
+      const dateB = new Date(b.data || b.date || b.created_at || 0);
+      return dateB.getTime() - dateA.getTime();
+    })
+    .slice(0, 5)
+    .map((venda) => ({
+      id: venda.id?.toString() || "N/A",
+      customer: clienteMap.get(venda.cliente_id) || "Cliente Desconhecido",
+      amount: `R$ ${(venda.valor || venda.total || venda.price || 0).toFixed(2)}`,
+      status: venda.status || "completed",
+    }));
+};
+
+export const calculatePreviousMonthRevenue = (vendas: Venda[]) => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const previousMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+  
+  const previousMonthRevenue = vendas.reduce((sum, venda) => {
+    const date = new Date(venda.data || venda.date || venda.created_at || Date.now());
+    if (date.getMonth() === previousMonth && date.getFullYear() === previousMonthYear) {
+      const valor = venda.valor || venda.total || venda.price || 0;
+      return sum + Number(valor);
+    }
+    return sum;
+  }, 0);
+  
+  return previousMonthRevenue;
+};
+
+export const calculateCurrentMonthRevenue = (vendas: Venda[]) => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const currentMonthRevenue = vendas.reduce((sum, venda) => {
+    const date = new Date(venda.data || venda.date || venda.created_at || Date.now());
+    if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+      const valor = venda.valor || venda.total || venda.price || 0;
+      return sum + Number(valor);
+    }
+    return sum;
+  }, 0);
+  
+  return currentMonthRevenue;
+};
+
+export const calculateRevenueChange = (vendas: Venda[]) => {
+  const current = calculateCurrentMonthRevenue(vendas);
+  const previous = calculatePreviousMonthRevenue(vendas);
+  
+  if (previous === 0) return 0;
+  
+  return Number((((current - previous) / previous) * 100).toFixed(1));
+};

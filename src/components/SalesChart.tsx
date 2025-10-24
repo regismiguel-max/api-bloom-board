@@ -1,16 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const data = [
-  { category: "Electronics", sales: 4000 },
-  { category: "Clothing", sales: 3000 },
-  { category: "Food", sales: 2000 },
-  { category: "Books", sales: 2780 },
-  { category: "Sports", sales: 1890 },
-  { category: "Home", sales: 2390 },
-];
+interface SalesChartProps {
+  data: Array<{ category: string; sales: number }>;
+  isLoading?: boolean;
+}
 
-export const SalesChart = () => {
+export const SalesChart = ({ data, isLoading }: SalesChartProps) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales by Category</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[300px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales by Category</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex h-[300px] items-center justify-center text-muted-foreground">
+            Nenhum dado disponível
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <Card>
       <CardHeader>

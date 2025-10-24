@@ -1,16 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const data = [
-  { month: "Jan", revenue: 4000, target: 3800 },
-  { month: "Feb", revenue: 3000, target: 3200 },
-  { month: "Mar", revenue: 5000, target: 4500 },
-  { month: "Apr", revenue: 4500, target: 4200 },
-  { month: "May", revenue: 6000, target: 5500 },
-  { month: "Jun", revenue: 5500, target: 5200 },
-];
+interface RevenueChartProps {
+  data: Array<{ month: string; revenue: number }>;
+  isLoading?: boolean;
+}
 
-export const RevenueChart = () => {
+export const RevenueChart = ({ data, isLoading }: RevenueChartProps) => {
+  if (isLoading) {
+    return (
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>Revenue Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[300px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>Revenue Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex h-[300px] items-center justify-center text-muted-foreground">
+            Nenhum dado disponível
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <Card className="col-span-2">
       <CardHeader>
