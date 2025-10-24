@@ -72,11 +72,19 @@ const Index = () => {
     return Array.from(grupos).sort();
   }, [vendasEnriquecidas]);
 
-  // Filtrar dados localmente por tipo de cliente (validar CPF/CNPJ) e grupo
+  // Filtrar dados localmente por status, tipo de cliente e grupo
   const vendasFiltradas = useMemo(() => {
     if (!vendasEnriquecidas?.length) return [];
     
     let filtered = vendasEnriquecidas;
+    
+    // Filtrar por status do pedido
+    if (dateFilters.statusPedido && dateFilters.statusPedido.length > 0) {
+      filtered = filtered.filter((venda) => {
+        const status = venda.STATUS_PEDIDO || venda.status || '';
+        return dateFilters.statusPedido!.includes(status);
+      });
+    }
     
     // Filtrar por tipo de cliente
     if (dateFilters.tipoCliente) {
@@ -87,17 +95,9 @@ const Index = () => {
         const docLimpo = doc.replace(/\D/g, '');
         
         if (dateFilters.tipoCliente === 'pf') {
-          const isCPF = docLimpo.length === 11;
-          if (!isCPF) {
-            console.log(`⚠️ Filtrado: ${doc} não é CPF (${docLimpo.length} dígitos)`);
-          }
-          return isCPF;
+          return docLimpo.length === 11;
         } else if (dateFilters.tipoCliente === 'pj') {
-          const isCNPJ = docLimpo.length === 14;
-          if (!isCNPJ) {
-            console.log(`⚠️ Filtrado: ${doc} não é CNPJ (${docLimpo.length} dígitos)`);
-          }
-          return isCNPJ;
+          return docLimpo.length === 14;
         }
         
         return true;
@@ -112,7 +112,7 @@ const Index = () => {
     }
     
     return filtered;
-  }, [vendasEnriquecidas, dateFilters.tipoCliente, dateFilters.nomeGrupo]);
+  }, [vendasEnriquecidas, dateFilters.tipoCliente, dateFilters.nomeGrupo, dateFilters.statusPedido]);
 
   useEffect(() => {
     console.log(`📊 Total vendas API: ${vendas.length}, Enriquecidas: ${vendasEnriquecidas.length}, Filtradas: ${vendasFiltradas.length}`);
