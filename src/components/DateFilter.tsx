@@ -9,6 +9,7 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
+import { useVendasStatus } from "@/hooks/useVendasStatus";
 
 interface DateFilterProps {
   onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string, tipoCliente?: string) => void;
@@ -22,6 +23,8 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
   });
   const [statusPedido, setStatusPedido] = useState<string>("todos");
   const [tipoCliente, setTipoCliente] = useState<string>("todos");
+  
+  const { data: statusList = [], isLoading: isLoadingStatus } = useVendasStatus();
 
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
@@ -108,17 +111,17 @@ export const DateFilter = ({ onFilterChange }: DateFilterProps) => {
             {/* Filtro de Status */}
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">Status do Pedido:</span>
-              <Select value={statusPedido} onValueChange={handleStatusChange}>
+              <Select value={statusPedido} onValueChange={handleStatusChange} disabled={isLoadingStatus}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione o status" />
+                  <SelectValue placeholder={isLoadingStatus ? "Carregando..." : "Selecione o status"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="PENDENTE">Pendente</SelectItem>
-                  <SelectItem value="CONFIRMADO">Confirmado</SelectItem>
-                  <SelectItem value="ENVIADO">Enviado</SelectItem>
-                  <SelectItem value="ENTREGUE">Entregue</SelectItem>
-                  <SelectItem value="CANCELADO">Cancelado</SelectItem>
+                  {statusList.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
