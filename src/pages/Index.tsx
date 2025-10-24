@@ -33,6 +33,44 @@ const Index = () => {
   const { data: vendas = [], isLoading: isLoadingVendas, error: errorVendas } = useVendas(dateFilters);
   const statusList = useVendasStatus(vendas);
 
+  // Filtrar dados localmente por tipo de cliente (validar CPF/CNPJ)
+  const vendasFiltradas = useMemo(() => {
+    if (!vendas?.length) return [];
+    
+    // Se não houver filtro de tipo de cliente, retornar todos os dados
+    if (!dateFilters.tipoCliente) return vendas;
+    
+    return vendas.filter((venda) => {
+      const doc = venda.CLIENTE_DOC;
+      if (!doc) return false;
+      
+      // Remover caracteres não numéricos para contar dígitos
+      const docLimpo = doc.replace(/\D/g, '');
+      
+      if (dateFilters.tipoCliente === 'pf') {
+        // Pessoa Física = CPF com 11 dígitos
+        const isCPF = docLimpo.length === 11;
+        if (!isCPF) {
+          console.log(`⚠️ Filtrado: ${doc} não é CPF (${docLimpo.length} dígitos)`);
+        }
+        return isCPF;
+      } else if (dateFilters.tipoCliente === 'pj') {
+        // Pessoa Jurídica = CNPJ com 14 dígitos
+        const isCNPJ = docLimpo.length === 14;
+        if (!isCNPJ) {
+          console.log(`⚠️ Filtrado: ${doc} não é CNPJ (${docLimpo.length} dígitos)`);
+        }
+        return isCNPJ;
+      }
+      
+      return true;
+    });
+  }, [vendas, dateFilters.tipoCliente]);
+
+  useEffect(() => {
+    console.log(`📊 Total vendas API: ${vendas.length}, Filtradas: ${vendasFiltradas.length}`);
+  }, [vendas.length, vendasFiltradas.length]);
+
   useEffect(() => {
     if (errorVendas) {
       toast({
@@ -46,51 +84,51 @@ const Index = () => {
   const isLoading = isLoadingVendas;
 
   const totalRevenue = useMemo(() => {
-    if (!vendas?.length) return 0;
-    return calculateTotalRevenue(vendas);
-  }, [vendas]);
+    if (!vendasFiltradas?.length) return 0;
+    return calculateTotalRevenue(vendasFiltradas);
+  }, [vendasFiltradas]);
 
   const revenueChange = useMemo(() => {
-    if (!vendas?.length) return 0;
-    return calculateRevenueChange(vendas);
-  }, [vendas]);
+    if (!vendasFiltradas?.length) return 0;
+    return calculateRevenueChange(vendasFiltradas);
+  }, [vendasFiltradas]);
 
   const monthlyRevenueData = useMemo(() => {
-    if (!vendas?.length) return [];
-    return calculateMonthlyRevenue(vendas);
-  }, [vendas]);
+    if (!vendasFiltradas?.length) return [];
+    return calculateMonthlyRevenue(vendasFiltradas);
+  }, [vendasFiltradas]);
 
   const salesByCategoryData = useMemo(() => {
-    if (!vendas?.length) return [];
-    return calculateSalesByCategory(vendas);
-  }, [vendas]);
+    if (!vendasFiltradas?.length) return [];
+    return calculateSalesByCategory(vendasFiltradas);
+  }, [vendasFiltradas]);
 
   const recentOrders = useMemo(() => {
-    if (!vendas?.length) return [];
-    return getRecentOrders(vendas);
-  }, [vendas]);
+    if (!vendasFiltradas?.length) return [];
+    return getRecentOrders(vendasFiltradas);
+  }, [vendasFiltradas]);
 
   const totalOrders = useMemo(() => {
-    if (!vendas?.length) return 0;
+    if (!vendasFiltradas?.length) return 0;
     // Contar pedidos únicos, não linhas da API
     const pedidosUnicos = new Set(
-      vendas
+      vendasFiltradas
         .map(v => v.PEDIDO || v.id?.toString())
         .filter(Boolean)
     );
     return pedidosUnicos.size;
-  }, [vendas]);
+  }, [vendasFiltradas]);
   
   // Calcular clientes únicos das vendas (usando CLIENTE_DOC como identificador)
   const totalClientes = useMemo(() => {
-    if (!vendas?.length) return 0;
+    if (!vendasFiltradas?.length) return 0;
     const clientesUnicos = new Set(
-      vendas
+      vendasFiltradas
         .map(v => v.CLIENTE_DOC || v.CLIENTE_NOME || v.CODIGO_EXP)
         .filter(Boolean)
     );
     return clientesUnicos.size;
-  }, [vendas]);
+  }, [vendasFiltradas]);
   
   const conversionRate = useMemo(() => {
     if (totalClientes === 0) return "0.00";
