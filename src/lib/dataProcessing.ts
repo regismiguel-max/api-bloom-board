@@ -2,6 +2,7 @@ import { Venda } from "@/hooks/useVendas";
 import { Cliente } from "@/hooks/useClientes";
 
 export const calculateTotalRevenue = (vendas: Venda[]) => {
+  if (!vendas || vendas.length === 0) return 0;
   const total = vendas.reduce((sum, venda) => {
     const valor = venda.valor || venda.total || venda.price || 0;
     return sum + Number(valor);
@@ -46,7 +47,11 @@ export const calculateSalesByCategory = (vendas: Venda[]) => {
 };
 
 export const getRecentOrders = (vendas: Venda[], clientes: Cliente[]) => {
-  const clienteMap = new Map(clientes.map((c) => [c.id, c.nome || c.name || "Cliente"]));
+  if (!vendas || !clientes || vendas.length === 0) return [];
+  
+  const clienteMap = new Map(
+    clientes.map((c) => [c.id, c.nome || c.name || "Cliente"])
+  );
   
   return vendas
     .slice()
@@ -58,8 +63,8 @@ export const getRecentOrders = (vendas: Venda[], clientes: Cliente[]) => {
     .slice(0, 5)
     .map((venda) => ({
       id: venda.id?.toString() || "N/A",
-      customer: clienteMap.get(venda.cliente_id) || "Cliente Desconhecido",
-      amount: `R$ ${(venda.valor || venda.total || venda.price || 0).toFixed(2)}`,
+      customer: clienteMap.get(venda.cliente_id || venda.customer_id) || "Cliente Desconhecido",
+      amount: `R$ ${Number(venda.valor || venda.total || venda.price || 0).toFixed(2)}`,
       status: venda.status || "completed",
     }));
 };
