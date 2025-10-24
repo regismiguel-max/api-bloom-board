@@ -40,7 +40,7 @@ interface VendasFilters {
   tipoCliente?: string;
 }
 
-// Função para buscar todas as vendas com filtro de data (status e tipo aplicados client-side)
+// Função para buscar todas as vendas com filtros
 const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
   const queryParams = new URLSearchParams({
     limite: "0",
@@ -48,7 +48,8 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
 
   if (filters?.dataInicio) queryParams.append("data_inicio", filters.dataInicio);
   if (filters?.dataFim) queryParams.append("data_fim", filters.dataFim);
-  // Removido: status_pedido e tipo_cliente - filtrados no client
+  if (filters?.statusPedido) queryParams.append("status_pedido", filters.statusPedido);
+  if (filters?.tipoCliente) queryParams.append("tipo_cliente", filters.tipoCliente);
 
   const { data, error } = await supabase.functions.invoke(
     `api-vendas?${queryParams.toString()}`,
@@ -67,14 +68,8 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
 };
 
 export const useVendas = (filters?: VendasFilters) => {
-  // Usar apenas dataInicio e dataFim para o cache key
-  // Status e tipo de cliente são filtrados client-side
-  const cacheKey = filters 
-    ? { dataInicio: filters.dataInicio, dataFim: filters.dataFim }
-    : undefined;
-    
   return useQuery({
-    queryKey: ["vendas", cacheKey],
+    queryKey: ["vendas", filters],
     queryFn: async () => {
       try {
         const vendas = await fetchAllVendas(filters);
