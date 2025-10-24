@@ -40,9 +40,11 @@ interface VendasFilters {
 // Função para buscar todas as páginas recursivamente
 const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
   const allVendas: Venda[] = [];
+  const pedidosVistos = new Set<string>();
   let page = 1;
   let hasMore = true;
   const limit = 100;
+  let paginasSemNovosDados = 0;
 
   while (hasMore) {
     // Construir query string
@@ -53,8 +55,6 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
     
     if (filters?.dataInicio) queryParams.append('data_inicio', filters.dataInicio);
     if (filters?.dataFim) queryParams.append('data_fim', filters.dataFim);
-    
-    console.log(`Fetching vendas page ${page} with filters:`, filters);
     
     const { data, error } = await supabase.functions.invoke(
       `api-vendas?${queryParams.toString()}`,
@@ -67,22 +67,42 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
     }
     
     const vendas = data.vendas || [];
-    allVendas.push(...vendas);
+    const vendasAntesDeAdicionar = allVendas.length;
     
-    console.log(`Page ${page}: ${vendas.length} vendas (Total so far: ${allVendas.length}, API Total: ${data.total})`);
+    // Verificar se há novos pedidos nesta página
+    let novosPedidosNestaPagina = 0;
+    vendas.forEach((venda: Venda) => {
+      const pedidoId = venda.PEDIDO || venda.id?.toString();
+      if (pedidoId && !pedidosVistos.has(pedidoId)) {
+        pedidosVistos.add(pedidoId);
+        novosPedidosNestaPagina++;
+      }
+      allVendas.push(venda);
+    });
     
-    // Continuar se ainda tem mais dados
-    hasMore = data.hasMore && vendas.length === limit;
+    console.log(`Page ${page}: ${vendas.length} registros, ${novosPedidosNestaPagina} novos pedidos únicos (Total: ${allVendas.length} registros, ${pedidosVistos.size} pedidos únicos)`);
+    
+    // Se não encontrou nenhum pedido novo, incrementar contador
+    if (novosPedidosNestaPagina === 0) {
+      paginasSemNovosDados++;
+    } else {
+      paginasSemNovosDados = 0;
+    }
+    
+    // Parar se:
+    // 1. Retornou menos registros que o limite (última página)
+    // 2. Ou se 3 páginas seguidas não trouxeram novos pedidos (dados repetidos)
+    hasMore = vendas.length === limit && paginasSemNovosDados < 3;
     page++;
     
     // Limite de segurança para evitar loops infinitos
-    if (page > 100) {
-      console.warn('Reached maximum page limit (100)');
+    if (page > 200) {
+      console.warn('Reached maximum page limit (200)');
       break;
     }
   }
   
-  console.log(`Fetched total: ${allVendas.length} vendas`);
+  console.log(`✅ Fetched total: ${allVendas.length} registros de ${pedidosVistos.size} pedidos únicos`);
   return allVendas;
 };
 
