@@ -20,7 +20,7 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
     return (
       <Card className="col-span-2">
         <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
+          <CardTitle>Pedidos Recentes</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -38,13 +38,13 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
   if (!orders || orders.length === 0) {
     return (
       <Card className="col-span-2">
-        <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-            Nenhum pedido recente
-          </div>
+      <CardHeader>
+        <CardTitle>Pedidos Recentes</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex h-[200px] items-center justify-center text-muted-foreground">
+          Nenhum pedido recente
+        </div>
         </CardContent>
       </Card>
     );
@@ -66,15 +66,15 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
   return (
     <Card className="col-span-2">
       <CardHeader>
-        <CardTitle>Recent Orders</CardTitle>
+        <CardTitle>Pedidos Recentes</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Amount</TableHead>
+              <TableHead>Pedido</TableHead>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Valor</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -86,7 +86,9 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
                 <TableCell>{order.amount}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={getStatusColor(order.status)}>
-                    {order.status}
+                    {order.status === "completed" ? "Concluído" : 
+                     order.status === "pending" ? "Pendente" : 
+                     order.status === "processing" ? "Processando" : order.status}
                   </Badge>
                 </TableCell>
               </TableRow>

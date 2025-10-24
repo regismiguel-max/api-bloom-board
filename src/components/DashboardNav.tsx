@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: BarChart3, label: "Dashboard", active: true },
-  { icon: TrendingUp, label: "Analytics", active: false },
-  { icon: Users, label: "Users", active: false },
-  { icon: ShoppingCart, label: "Sales", active: false },
-  { icon: Settings, label: "Settings", active: false },
+  { icon: TrendingUp, label: "Análises", active: false },
+  { icon: Users, label: "Usuários", active: false },
+  { icon: ShoppingCart, label: "Vendas", active: false },
+  { icon: Settings, label: "Configurações", active: false },
 ];
 
 export const DashboardNav = () => {
@@ -62,11 +62,11 @@ export const DashboardNav = () => {
           <div className="border-t border-sidebar-border p-4">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground font-medium">
-                JD
+                JS
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-sidebar-foreground">John Doe</p>
-                <p className="text-xs text-sidebar-foreground/60">Admin</p>
+                <p className="text-sm font-medium text-sidebar-foreground">João Silva</p>
+                <p className="text-xs text-sidebar-foreground/60">Administrador</p>
               </div>
             </div>
           </div>

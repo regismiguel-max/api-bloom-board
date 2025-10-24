@@ -28,7 +28,7 @@ export const KPICard = ({ title, value, change, icon: Icon, trend }: KPICardProp
                 >
                   {trend === "up" ? "+" : ""}{change}%
                 </span>
-                <span className="text-xs text-muted-foreground">vs last month</span>
+                <span className="text-xs text-muted-foreground">vs mês anterior</span>
               </div>
             )}
           </div>

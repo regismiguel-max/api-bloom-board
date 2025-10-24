@@ -116,7 +116,6 @@ const Index = () => {
           <SalesChart data={salesByCategoryData} isLoading={isLoading} />
         </div>
 
-        {/* Data Table */}
         <div className="grid gap-6 lg:grid-cols-3">
           <DataTable orders={recentOrders} isLoading={isLoading} />
         </div>

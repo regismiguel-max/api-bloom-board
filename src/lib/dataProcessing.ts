@@ -1,5 +1,7 @@
 import { Venda } from "@/hooks/useVendas";
 import { Cliente } from "@/hooks/useClientes";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export const calculateTotalRevenue = (vendas: Venda[]) => {
   if (!vendas || vendas.length === 0) return 0;
@@ -23,16 +25,22 @@ export const calculateMonthlyRevenue = (vendas: Venda[]) => {
       ? new Date(Number(dateParts[2]), Number(dateParts[1]) - 1, Number(dateParts[0]))
       : new Date(dateStr);
     
-    const monthKey = date.toLocaleDateString("pt-BR", { month: "short" });
+    // Usar format do date-fns com locale pt-BR
+    const monthKey = format(date, 'MMM', { locale: ptBR });
     const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
     
     monthlyData[monthKey] = (monthlyData[monthKey] || 0) + Number(valor);
   });
 
-  return Object.entries(monthlyData).map(([month, revenue]) => ({
-    month,
-    revenue: Math.round(revenue),
-  }));
+  // Ordenar meses cronologicamente
+  const monthOrder = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  
+  return Object.entries(monthlyData)
+    .sort(([a], [b]) => monthOrder.indexOf(a.toLowerCase()) - monthOrder.indexOf(b.toLowerCase()))
+    .map(([month, revenue]) => ({
+      month: month.charAt(0).toUpperCase() + month.slice(1), // Capitalizar
+      revenue: Math.round(revenue),
+    }));
 };
 
 export const calculateSalesByCategory = (vendas: Venda[]) => {
