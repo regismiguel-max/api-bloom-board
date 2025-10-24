@@ -17,9 +17,21 @@ export const useVendas = () => {
   return useQuery({
     queryKey: ["vendas"],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/vendas`);
+      const token = import.meta.env.VITE_API_TOKEN;
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/vendas`, {
+        headers,
+      });
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch vendas");
+        throw new Error(`Failed to fetch vendas: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
       return data as Venda[];

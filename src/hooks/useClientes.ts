@@ -14,9 +14,21 @@ export const useClientes = () => {
   return useQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
-      const response = await fetch(`${API_BASE_URL}/clientes`);
+      const token = import.meta.env.VITE_API_TOKEN;
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/clientes`, {
+        headers,
+      });
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch clientes");
+        throw new Error(`Failed to fetch clientes: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
       return data as Cliente[];
