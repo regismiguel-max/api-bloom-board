@@ -1,5 +1,4 @@
 import { Venda } from "@/hooks/useVendas";
-import { Cliente } from "@/hooks/useClientes";
 import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -82,15 +81,8 @@ export const calculateSalesByCategory = (vendas: Venda[]) => {
     .slice(0, 6);
 };
 
-export const getRecentOrders = (vendas: Venda[], clientes: Cliente[]) => {
-  if (!vendas || !clientes || vendas.length === 0) return [];
-  
-  const clienteMap = new Map(
-    clientes.map((c) => [
-      c.CODIGO_CLIENTE || c.id, 
-      c.NOME_CLIENTE || c.nome || c.name || "Cliente"
-    ])
-  );
+export const getRecentOrders = (vendas: Venda[]) => {
+  if (!vendas || vendas.length === 0) return [];
   
   return vendas
     .slice()
@@ -109,7 +101,7 @@ export const getRecentOrders = (vendas: Venda[], clientes: Cliente[]) => {
     .slice(0, 5)
     .map((venda) => ({
       id: (venda.PEDIDO || venda.id)?.toString() || "N/A",
-      customer: venda.CLIENTE_NOME || clienteMap.get(venda.CODIGO_EXP || venda.cliente_id || venda.customer_id) || "Cliente Desconhecido",
+      customer: venda.CLIENTE_NOME || "Cliente Desconhecido",
       amount: `R$ ${Number(venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0).toFixed(2)}`,
       status: venda.status || "completed",
     }));

@@ -6,7 +6,6 @@ import { DataTable } from "@/components/DataTable";
 import { DateFilter } from "@/components/DateFilter";
 import { DollarSign, Users, ShoppingCart, TrendingUp } from "lucide-react";
 import { useVendas } from "@/hooks/useVendas";
-import { useClientes } from "@/hooks/useClientes";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useMemo, useState } from "react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
@@ -21,7 +20,6 @@ import {
 
 const Index = () => {
   const { toast } = useToast();
-  const { data: clientes = [], isLoading: isLoadingClientes, error: errorClientes } = useClientes();
   
   // Estado para os filtros de data
   const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string }>(() => {
@@ -41,16 +39,9 @@ const Index = () => {
         variant: "destructive",
       });
     }
-    if (errorClientes) {
-      toast({
-        title: "Erro ao carregar clientes",
-        description: "Não foi possível conectar à API de clientes. Verifique a conexão.",
-        variant: "destructive",
-      });
-    }
-  }, [errorVendas, errorClientes, toast]);
+  }, [errorVendas, toast]);
 
-  const isLoading = isLoadingVendas || isLoadingClientes;
+  const isLoading = isLoadingVendas;
 
   const totalRevenue = useMemo(() => {
     if (!vendas?.length) return 0;
@@ -73,12 +64,22 @@ const Index = () => {
   }, [vendas]);
 
   const recentOrders = useMemo(() => {
-    if (!vendas?.length || !clientes?.length) return [];
-    return getRecentOrders(vendas, clientes);
-  }, [vendas, clientes]);
+    if (!vendas?.length) return [];
+    return getRecentOrders(vendas);
+  }, [vendas]);
 
   const totalOrders = vendas?.length || 0;
-  const totalClientes = clientes?.length || 0;
+  
+  // Calcular clientes únicos das vendas (usando CLIENTE_DOC como identificador)
+  const totalClientes = useMemo(() => {
+    if (!vendas?.length) return 0;
+    const clientesUnicos = new Set(
+      vendas
+        .map(v => v.CLIENTE_DOC || v.CLIENTE_NOME || v.CODIGO_EXP)
+        .filter(Boolean)
+    );
+    return clientesUnicos.size;
+  }, [vendas]);
   
   const conversionRate = useMemo(() => {
     if (totalClientes === 0) return "0.00";
@@ -114,7 +115,7 @@ const Index = () => {
             icon={DollarSign}
           />
           <KPICard
-            title="Total de Clientes"
+            title="Clientes Únicos"
             value={(totalClientes || 0).toLocaleString("pt-BR")}
             icon={Users}
           />
