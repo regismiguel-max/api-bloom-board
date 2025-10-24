@@ -8,8 +8,10 @@ export interface Cliente {
   nome?: string;
   name?: string;
   NOME_CLIENTE?: string;
+  NOME?: string;
   email?: string;
   CPF_CNPJ?: string;
+  NOME_GRUPO?: string;
   telefone?: string;
   phone?: string;
   CELULAR?: string;
@@ -37,16 +39,17 @@ export const useClientes = () => {
         return mockClientes;
       }
       
-      // Se a API retornar array vazio, usar dados mock para demonstração
-      const clientesData = Array.isArray(data) ? data : [];
+      // Extrair array de clientes do objeto de resposta
+      const clientesData = data?.clientes || (Array.isArray(data) ? data : []);
       if (clientesData.length === 0) {
         console.log('API returned empty array, using mock data');
         return mockClientes;
       }
       
+      console.log(`✅ Loaded ${clientesData.length} clientes from API`);
       return clientesData as Cliente[];
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 30, // 30 minutos
     retry: 2,
   });
 };

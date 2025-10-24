@@ -12,11 +12,12 @@ import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
 interface DateFilterProps {
-  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string) => void;
+  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string) => void;
   statusList?: string[];
+  gruposClientes?: string[];
 }
 
-export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps) => {
+export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [] }: DateFilterProps) => {
   const now = new Date();
   const [date, setDate] = useState<DateRange | undefined>({
     from: startOfMonth(now),
@@ -24,6 +25,7 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
   });
   const [statusPedido, setStatusPedido] = useState<string[]>([]);
   const [tipoCliente, setTipoCliente] = useState<string>("todos");
+  const [nomeGrupo, setNomeGrupo] = useState<string>("todos");
 
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
@@ -35,7 +37,8 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
         dataInicio, 
         dataFim, 
         statusPedido.length > 0 ? statusPedido : undefined,
-        tipoCliente !== "todos" ? tipoCliente : undefined
+        tipoCliente !== "todos" ? tipoCliente : undefined,
+        nomeGrupo !== "todos" ? nomeGrupo : undefined
       );
     }
   };
@@ -54,7 +57,8 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
         dataInicio, 
         dataFim, 
         newStatus.length > 0 ? newStatus : undefined,
-        tipoCliente !== "todos" ? tipoCliente : undefined
+        tipoCliente !== "todos" ? tipoCliente : undefined,
+        nomeGrupo !== "todos" ? nomeGrupo : undefined
       );
     }
   };
@@ -69,7 +73,24 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
         dataInicio, 
         dataFim, 
         statusPedido.length > 0 ? statusPedido : undefined,
-        newTipo !== "todos" ? newTipo : undefined
+        newTipo !== "todos" ? newTipo : undefined,
+        nomeGrupo !== "todos" ? nomeGrupo : undefined
+      );
+    }
+  };
+
+  const handleNomeGrupoChange = (newGrupo: string) => {
+    setNomeGrupo(newGrupo);
+    
+    if (date?.from && date?.to) {
+      const dataInicio = format(date.from, 'yyyy-MM-dd');
+      const dataFim = format(date.to, 'yyyy-MM-dd');
+      onFilterChange(
+        dataInicio, 
+        dataFim, 
+        statusPedido.length > 0 ? statusPedido : undefined,
+        tipoCliente !== "todos" ? tipoCliente : undefined,
+        newGrupo !== "todos" ? newGrupo : undefined
       );
     }
   };
@@ -101,7 +122,8 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
       dataInicio, 
       dataFim, 
       statusPedido.length > 0 ? statusPedido : undefined,
-      tipoCliente !== "todos" ? tipoCliente : undefined
+      tipoCliente !== "todos" ? tipoCliente : undefined,
+      nomeGrupo !== "todos" ? nomeGrupo : undefined
     );
   };
 
@@ -110,7 +132,7 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
           {/* Filtros em linha */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Filtro de Status */}
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">Status do Pedido:</span>
@@ -175,10 +197,28 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background z-50">
                   <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="pf">Pessoa Física (CPF)</SelectItem>
                   <SelectItem value="pj">Pessoa Jurídica (CNPJ)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Filtro de Grupo de Cliente */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">Grupo de Cliente:</span>
+              <Select value={nomeGrupo} onValueChange={handleNomeGrupoChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o grupo" />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-50">
+                  <SelectItem value="todos">Todos</SelectItem>
+                  {gruposClientes.map((grupo) => (
+                    <SelectItem key={grupo} value={grupo}>
+                      {grupo}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
