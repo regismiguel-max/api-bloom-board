@@ -156,6 +156,7 @@ export const getRecentOrders = (vendas: Venda[]) => {
       return {
         id: pedidoId,
         customer: firstItem.CLIENTE_NOME || "Cliente Desconhecido",
+        customerDoc: firstItem.CLIENTE_DOC || "",
         amount: totalPedido,
         status: firstItem.STATUS_PEDIDO || firstItem.status || "Sem Status",
         totalItems: firstItem.QTDE_ITENS_PEDIDO || items.length,

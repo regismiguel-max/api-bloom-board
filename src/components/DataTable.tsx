@@ -3,8 +3,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Search } from "lucide-react";
 import { useState, useMemo } from "react";
 
 interface OrderItem {
@@ -15,6 +16,7 @@ interface OrderItem {
 interface Order {
   id: string;
   customer: string;
+  customerDoc: string;
   amount: number;
   status: string;
   totalItems: number;
@@ -31,14 +33,31 @@ const ITEMS_PER_PAGE = 10;
 
 export const DataTable = ({ orders, isLoading }: DataTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+  const filteredOrders = useMemo(() => {
+    if (!searchTerm.trim()) return orders;
+    
+    const search = searchTerm.toLowerCase();
+    return orders.filter(order => 
+      order.id.toLowerCase().includes(search) ||
+      order.customer.toLowerCase().includes(search) ||
+      order.customerDoc.replace(/\D/g, '').includes(search.replace(/\D/g, ''))
+    );
+  }, [orders, searchTerm]);
+
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
   
   const paginatedOrders = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return orders.slice(startIndex, endIndex);
-  }, [orders, currentPage]);
+    return filteredOrders.slice(startIndex, endIndex);
+  }, [filteredOrders, currentPage]);
+
+  // Reset to page 1 when search changes
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const getStatusColor = (status: string) => {
     const statusLower = status?.toLowerCase() || "";
@@ -89,7 +108,16 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pedidos Recentes ({orders.length} total)</CardTitle>
+        <CardTitle>Pedidos Recentes ({filteredOrders.length} total)</CardTitle>
+        <div className="relative mt-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por pedido, cliente ou CNPJ..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
