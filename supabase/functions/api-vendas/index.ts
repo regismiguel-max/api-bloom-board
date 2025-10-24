@@ -17,10 +17,11 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const page = url.searchParams.get('page') || '1';
     const limit = url.searchParams.get('limit') || '100';
+    const limite = url.searchParams.get('limite');
     const dataInicio = url.searchParams.get('data_inicio');
     const dataFim = url.searchParams.get('data_fim');
 
-    console.log(`Fetching vendas - Page: ${page}, Limit: ${limit}, Periodo: ${dataInicio} a ${dataFim}`);
+    console.log(`Fetching vendas - Page: ${page}, Limit: ${limit}, Limite: ${limite ?? 'n/a'}, Periodo: ${dataInicio} a ${dataFim}`);
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -33,10 +34,17 @@ Deno.serve(async (req) => {
       console.warn('API_TOKEN not found in environment');
     }
 
-    // Construir URL com query params
-    let apiUrl = `${API_BASE_URL}/vendas?page=${page}&limit=${limit}`;
-    if (dataInicio) apiUrl += `&data_inicio=${dataInicio}`;
-    if (dataFim) apiUrl += `&data_fim=${dataFim}`;
+    // Construir URL com query params (prioriza "limite" quando presente)
+    let apiUrl: string;
+    if (limite !== null) {
+      apiUrl = `${API_BASE_URL}/vendas?limite=${encodeURIComponent(limite)}`;
+      if (dataInicio) apiUrl += `&data_inicio=${encodeURIComponent(dataInicio)}`;
+      if (dataFim) apiUrl += `&data_fim=${encodeURIComponent(dataFim)}`;
+    } else {
+      apiUrl = `${API_BASE_URL}/vendas?page=${page}&limit=${limit}`;
+      if (dataInicio) apiUrl += `&data_inicio=${encodeURIComponent(dataInicio)}`;
+      if (dataFim) apiUrl += `&data_fim=${encodeURIComponent(dataFim)}`;
+    }
 
     console.log('API URL:', apiUrl);
 
@@ -72,15 +80,17 @@ Deno.serve(async (req) => {
     
     console.log(`Successfully fetched ${vendasArray.length} vendas (Total: ${total})`);
 
-    // Retornar com metadados de paginação
+    // Retornar com metadados
+    const responsePayload = {
+      vendas: vendasArray,
+      total: total,
+      page: limite !== null ? 1 : parseInt(page),
+      limit: limite !== null ? parseInt(limite || '0') : parseInt(limit),
+      hasMore: limite !== null ? false : vendasArray.length === parseInt(limit),
+    };
+
     return new Response(
-      JSON.stringify({
-        vendas: vendasArray,
-        total: total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        hasMore: vendasArray.length === parseInt(limit)
-      }),
+      JSON.stringify(responsePayload),
       { 
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
