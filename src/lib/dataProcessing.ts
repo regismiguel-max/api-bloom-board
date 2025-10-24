@@ -1,7 +1,31 @@
 import { Venda } from "@/hooks/useVendas";
 import { Cliente } from "@/hooks/useClientes";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+// Helper para fazer parse seguro de datas
+const parseDate = (dateStr: string | undefined | null): Date | null => {
+  if (!dateStr || typeof dateStr !== 'string') return null;
+  
+  // Parse DD/MM/YYYY format
+  if (dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return null;
+    
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+    
+    const date = new Date(year, month - 1, day);
+    return isValid(date) ? date : null;
+  }
+  
+  // Try ISO format
+  const date = new Date(dateStr);
+  return isValid(date) ? date : null;
+};
 
 export const calculateTotalRevenue = (vendas: Venda[]) => {
   if (!vendas || vendas.length === 0) return 0;
@@ -17,13 +41,9 @@ export const calculateMonthlyRevenue = (vendas: Venda[]) => {
   
   vendas.forEach((venda) => {
     const dateStr = venda.DATA_VENDA || venda.data || venda.date || venda.created_at;
-    if (!dateStr) return;
+    const date = parseDate(dateStr);
     
-    // Parse DD/MM/YYYY format
-    const dateParts = dateStr.includes('/') ? dateStr.split('/') : null;
-    const date = dateParts 
-      ? new Date(Number(dateParts[2]), Number(dateParts[1]) - 1, Number(dateParts[0]))
-      : new Date(dateStr);
+    if (!date) return; // Skip invalid dates
     
     // Usar format do date-fns com locale pt-BR
     const monthKey = format(date, 'MMM', { locale: ptBR });
@@ -78,16 +98,13 @@ export const getRecentOrders = (vendas: Venda[], clientes: Cliente[]) => {
       const dateStrA = a.DATA_VENDA || a.data || a.date || a.created_at || '';
       const dateStrB = b.DATA_VENDA || b.data || b.date || b.created_at || '';
       
-      // Parse DD/MM/YYYY format
-      const parseDate = (str: string) => {
-        if (!str) return new Date(0);
-        const parts = str.includes('/') ? str.split('/') : null;
-        return parts 
-          ? new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]))
-          : new Date(str);
-      };
+      const dateA = parseDate(dateStrA);
+      const dateB = parseDate(dateStrB);
       
-      return parseDate(dateStrB).getTime() - parseDate(dateStrA).getTime();
+      if (!dateA) return 1;  // Move invalid dates to end
+      if (!dateB) return -1;
+      
+      return dateB.getTime() - dateA.getTime();
     })
     .slice(0, 5)
     .map((venda) => ({
@@ -108,12 +125,9 @@ export const calculatePreviousMonthRevenue = (vendas: Venda[]) => {
   
   const previousMonthRevenue = vendas.reduce((sum, venda) => {
     const dateStr = venda.DATA_VENDA || venda.data || venda.date || venda.created_at;
-    if (!dateStr) return sum;
+    const date = parseDate(dateStr);
     
-    const dateParts = dateStr.includes('/') ? dateStr.split('/') : null;
-    const date = dateParts 
-      ? new Date(Number(dateParts[2]), Number(dateParts[1]) - 1, Number(dateParts[0]))
-      : new Date(dateStr);
+    if (!date) return sum;
       
     if (date.getMonth() === previousMonth && date.getFullYear() === previousMonthYear) {
       const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
@@ -132,12 +146,9 @@ export const calculateCurrentMonthRevenue = (vendas: Venda[]) => {
   
   const currentMonthRevenue = vendas.reduce((sum, venda) => {
     const dateStr = venda.DATA_VENDA || venda.data || venda.date || venda.created_at;
-    if (!dateStr) return sum;
+    const date = parseDate(dateStr);
     
-    const dateParts = dateStr.includes('/') ? dateStr.split('/') : null;
-    const date = dateParts 
-      ? new Date(Number(dateParts[2]), Number(dateParts[1]) - 1, Number(dateParts[0]))
-      : new Date(dateStr);
+    if (!date) return sum;
       
     if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
       const valor = venda.TOTAL_PEDIDO || venda.valor || venda.total || venda.price || 0;
