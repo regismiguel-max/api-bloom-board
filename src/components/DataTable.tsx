@@ -27,11 +27,12 @@ interface Order {
 interface DataTableProps {
   orders: Order[];
   isLoading?: boolean;
+  totalUnfiltered?: number;
 }
 
 const ITEMS_PER_PAGE = 10;
 
-export const DataTable = ({ orders, isLoading }: DataTableProps) => {
+export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -54,10 +55,10 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
     return filteredOrders.slice(startIndex, endIndex);
   }, [filteredOrders, currentPage]);
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search changes or orders change
   useMemo(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, orders]);
 
   const getStatusColor = (status: string) => {
     const statusLower = status?.toLowerCase() || "";
@@ -108,7 +109,17 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pedidos Recentes ({filteredOrders.length} total)</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>
+            Pedidos Recentes ({filteredOrders.length} 
+            {totalUnfiltered && totalUnfiltered !== orders.length && (
+              <span className="text-muted-foreground"> de {totalUnfiltered} total</span>
+            )}
+            {orders.length !== filteredOrders.length && (
+              <span className="text-muted-foreground"> | {orders.length} após filtros da página</span>
+            )})
+          </CardTitle>
+        </div>
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input

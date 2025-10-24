@@ -150,6 +150,16 @@ const Index = () => {
     return getRecentOrders(vendasFiltradas);
   }, [vendasFiltradas]);
 
+  const totalOrdersUnfiltered = useMemo(() => {
+    if (!vendas?.length) return 0;
+    const pedidosUnicos = new Set(
+      vendas
+        .map(v => v.PEDIDO || v.id?.toString())
+        .filter(Boolean)
+    );
+    return pedidosUnicos.size;
+  }, [vendas]);
+
   const totalOrders = useMemo(() => {
     if (!vendasFiltradas?.length) return 0;
     // Contar pedidos únicos, não linhas da API
@@ -234,7 +244,7 @@ const Index = () => {
         </div>
 
         {/* Data Table */}
-        <DataTable orders={recentOrders} isLoading={isLoading} />
+        <DataTable orders={recentOrders} isLoading={isLoading} totalUnfiltered={totalOrdersUnfiltered} />
       </main>
     </div>
   );
