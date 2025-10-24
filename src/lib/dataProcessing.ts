@@ -154,6 +154,7 @@ export const getRecentOrders = (vendas: Venda[]) => {
         customer: venda.CLIENTE_NOME || "Cliente Desconhecido",
         amount: totalPedido,
         status: venda.STATUS_PEDIDO || venda.status || "Sem Status",
+        totalItems: venda.QTDE_ITENS_PEDIDO || 0,
       };
     });
 };

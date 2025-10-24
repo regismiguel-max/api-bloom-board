@@ -11,6 +11,7 @@ interface Order {
   customer: string;
   amount: number;
   status: string;
+  totalItems: number;
 }
 
 interface DataTableProps {
@@ -89,6 +90,7 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
               <TableHead>Pedido</TableHead>
               <TableHead>Cliente</TableHead>
               <TableHead>Valor</TableHead>
+              <TableHead>Total de Itens</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -103,6 +105,7 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
                     currency: 'BRL' 
                   }).format(order.amount)}
                 </TableCell>
+                <TableCell className="text-center">{order.totalItems}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={getStatusColor(order.status)}>
                     {order.status}
