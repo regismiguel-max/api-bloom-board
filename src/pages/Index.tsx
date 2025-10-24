@@ -23,7 +23,7 @@ const Index = () => {
   const { toast } = useToast();
   
   // Estado para os filtros de data e status
-  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string; tipoCliente?: string }>(() => {
+  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string[]; tipoCliente?: string }>(() => {
     const now = new Date();
     const dataInicio = format(startOfMonth(now), 'yyyy-MM-dd');
     const dataFim = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -142,7 +142,7 @@ const Index = () => {
     return ((totalOrders / totalClientes) * 100).toFixed(2);
   }, [totalOrders, totalClientes]);
 
-  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string, tipoCliente?: string) => {
+  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string) => {
     console.log('Filter changed:', { dataInicio, dataFim, statusPedido, tipoCliente });
     setIsFiltering(true);
     setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente });
@@ -155,7 +155,7 @@ const Index = () => {
       <main className="flex-1 md:ml-64 p-6 md:p-8 space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Pedido X Venda</h1>
           <p className="text-muted-foreground">Dados em tempo real da sua operação.</p>
         </div>
 

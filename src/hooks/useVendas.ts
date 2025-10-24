@@ -36,7 +36,7 @@ export interface Venda {
 interface VendasFilters {
   dataInicio?: string;
   dataFim?: string;
-  statusPedido?: string;
+  statusPedido?: string[];
   tipoCliente?: string;
 }
 
@@ -48,7 +48,9 @@ const fetchAllVendas = async (filters?: VendasFilters): Promise<Venda[]> => {
 
   if (filters?.dataInicio) queryParams.append("data_inicio", filters.dataInicio);
   if (filters?.dataFim) queryParams.append("data_fim", filters.dataFim);
-  if (filters?.statusPedido) queryParams.append("status_pedido", filters.statusPedido);
+  if (filters?.statusPedido && filters.statusPedido.length > 0) {
+    queryParams.append("status_pedido", filters.statusPedido.join(','));
+  }
   if (filters?.tipoCliente) queryParams.append("tipo_cliente", filters.tipoCliente);
 
   const { data, error } = await supabase.functions.invoke(

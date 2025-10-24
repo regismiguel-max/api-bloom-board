@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
 interface DateFilterProps {
-  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string, tipoCliente?: string) => void;
+  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string) => void;
   statusList?: string[];
 }
 
@@ -21,7 +22,7 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
     from: startOfMonth(now),
     to: endOfMonth(now),
   });
-  const [statusPedido, setStatusPedido] = useState<string>("todos");
+  const [statusPedido, setStatusPedido] = useState<string[]>([]);
   const [tipoCliente, setTipoCliente] = useState<string>("todos");
 
   const handleDateSelect = (newDate: DateRange | undefined) => {
@@ -33,13 +34,17 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
       onFilterChange(
         dataInicio, 
         dataFim, 
-        statusPedido !== "todos" ? statusPedido : undefined,
+        statusPedido.length > 0 ? statusPedido : undefined,
         tipoCliente !== "todos" ? tipoCliente : undefined
       );
     }
   };
 
-  const handleStatusChange = (newStatus: string) => {
+  const handleStatusToggle = (status: string) => {
+    const newStatus = statusPedido.includes(status)
+      ? statusPedido.filter(s => s !== status)
+      : [...statusPedido, status];
+    
     setStatusPedido(newStatus);
     
     if (date?.from && date?.to) {
@@ -48,7 +53,7 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
       onFilterChange(
         dataInicio, 
         dataFim, 
-        newStatus !== "todos" ? newStatus : undefined,
+        newStatus.length > 0 ? newStatus : undefined,
         tipoCliente !== "todos" ? tipoCliente : undefined
       );
     }
@@ -63,7 +68,7 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
       onFilterChange(
         dataInicio, 
         dataFim, 
-        statusPedido !== "todos" ? statusPedido : undefined,
+        statusPedido.length > 0 ? statusPedido : undefined,
         newTipo !== "todos" ? newTipo : undefined
       );
     }
@@ -95,7 +100,7 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
     onFilterChange(
       dataInicio, 
       dataFim, 
-      statusPedido !== "todos" ? statusPedido : undefined,
+      statusPedido.length > 0 ? statusPedido : undefined,
       tipoCliente !== "todos" ? tipoCliente : undefined
     );
   };
@@ -109,19 +114,58 @@ export const DateFilter = ({ onFilterChange, statusList = [] }: DateFilterProps)
             {/* Filtro de Status */}
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">Status do Pedido:</span>
-              <Select value={statusPedido} onValueChange={handleStatusChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  {statusList.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
+                  >
+                    {statusPedido.length === 0 
+                      ? "Todos os status" 
+                      : statusPedido.length === 1
+                      ? statusPedido[0]
+                      : `${statusPedido.length} selecionados`
+                    }
+                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-3 bg-background z-50" align="start">
+                  <div className="space-y-2">
+                    {statusList.map((status) => (
+                      <div key={status} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`status-${status}`}
+                          checked={statusPedido.includes(status)}
+                          onCheckedChange={() => handleStatusToggle(status)}
+                        />
+                        <label
+                          htmlFor={`status-${status}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {status}
+                        </label>
+                      </div>
+                    ))}
+                    {statusPedido.length > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          setStatusPedido([]);
+                          if (date?.from && date?.to) {
+                            const dataInicio = format(date.from, 'yyyy-MM-dd');
+                            const dataFim = format(date.to, 'yyyy-MM-dd');
+                            onFilterChange(dataInicio, dataFim, undefined, tipoCliente !== "todos" ? tipoCliente : undefined);
+                          }
+                        }}
+                      >
+                        Limpar seleção
+                      </Button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Filtro de Tipo de Cliente */}
