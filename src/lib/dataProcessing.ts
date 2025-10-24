@@ -159,10 +159,10 @@ export const getRecentOrders = (vendas: Venda[]) => {
         amount: totalPedido,
         status: firstItem.STATUS_PEDIDO || firstItem.status || "Sem Status",
         totalItems: firstItem.QTDE_ITENS_PEDIDO || items.length,
+        vendedor: firstItem.VENDEDOR_NOME || "Vendedor não informado",
         items: items.map(item => ({
           produto: item.NOME_PRODUTO || item.produto || "Produto não informado",
-          marca: item.PRODUTO_MARCA || "Marca não informada",
-          vendedor: item.VENDEDOR_NOME || "Vendedor não informado"
+          marca: item.PRODUTO_MARCA || "Marca não informada"
         }))
       };
     });

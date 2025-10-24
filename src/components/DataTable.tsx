@@ -10,7 +10,6 @@ import { useState, useMemo } from "react";
 interface OrderItem {
   produto: string;
   marca: string;
-  vendedor: string;
 }
 
 interface Order {
@@ -19,6 +18,7 @@ interface Order {
   amount: number;
   status: string;
   totalItems: number;
+  vendedor: string;
   items: OrderItem[];
 }
 
@@ -132,10 +132,14 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
                         <DialogTitle>Detalhes do Pedido {order.id}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 mt-4">
-                        <div className="grid grid-cols-2 gap-4 pb-4 border-b">
+                        <div className="grid grid-cols-3 gap-4 pb-4 border-b">
                           <div>
                             <p className="text-sm text-muted-foreground">Cliente</p>
                             <p className="font-medium">{order.customer}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Vendedor</p>
+                            <p className="font-medium">{order.vendedor}</p>
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Total</p>
@@ -160,10 +164,6 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
                                   <div>
                                     <span className="text-sm text-muted-foreground">Marca: </span>
                                     <span>{item.marca}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-sm text-muted-foreground">Vendedor: </span>
-                                    <span>{item.vendedor}</span>
                                   </div>
                                 </div>
                               </div>
