@@ -110,15 +110,7 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>
-            Pedidos Recentes ({filteredOrders.length} 
-            {totalUnfiltered && totalUnfiltered !== orders.length && (
-              <span className="text-muted-foreground"> de {totalUnfiltered} total</span>
-            )}
-            {orders.length !== filteredOrders.length && (
-              <span className="text-muted-foreground"> | {orders.length} após filtros da página</span>
-            )})
-          </CardTitle>
+          <CardTitle>Pesquisa de pedidos</CardTitle>
         </div>
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -221,7 +213,13 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-muted-foreground">
-              Página {currentPage} de {totalPages}
+              Mostrando {filteredOrders.length} pedidos
+              {totalUnfiltered && totalUnfiltered !== orders.length && (
+                <> de {totalUnfiltered} total</>
+              )}
+              {orders.length !== filteredOrders.length && orders.length !== totalUnfiltered && (
+                <> | {orders.length} após filtros</>
+              )} • Página {currentPage} de {totalPages}
             </p>
             <div className="flex gap-2">
               <Button
@@ -243,6 +241,20 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
+          </div>
+        )}
+        
+        {totalPages <= 1 && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Total: {filteredOrders.length} pedidos
+              {totalUnfiltered && totalUnfiltered !== orders.length && (
+                <> de {totalUnfiltered}</>
+              )}
+              {orders.length !== filteredOrders.length && orders.length !== totalUnfiltered && (
+                <> | {orders.length} após filtros da página</>
+              )}
+            </p>
           </div>
         )}
       </CardContent>
