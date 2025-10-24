@@ -41,35 +41,35 @@ const Index = () => {
   const isLoading = isLoadingVendas || isLoadingClientes;
 
   const totalRevenue = useMemo(() => {
-    if (!vendas.length) return 0;
+    if (!vendas?.length) return 0;
     return calculateTotalRevenue(vendas);
   }, [vendas]);
 
   const revenueChange = useMemo(() => {
-    if (!vendas.length) return 0;
+    if (!vendas?.length) return 0;
     return calculateRevenueChange(vendas);
   }, [vendas]);
 
   const monthlyRevenueData = useMemo(() => {
-    if (!vendas.length) return [];
+    if (!vendas?.length) return [];
     return calculateMonthlyRevenue(vendas);
   }, [vendas]);
 
   const salesByCategoryData = useMemo(() => {
-    if (!vendas.length) return [];
+    if (!vendas?.length) return [];
     return calculateSalesByCategory(vendas);
   }, [vendas]);
 
   const recentOrders = useMemo(() => {
-    if (!vendas.length || !clientes.length) return [];
+    if (!vendas?.length || !clientes?.length) return [];
     return getRecentOrders(vendas, clientes);
   }, [vendas, clientes]);
 
-  const totalOrders = vendas.length;
-  const totalClientes = clientes.length;
+  const totalOrders = vendas?.length || 0;
+  const totalClientes = clientes?.length || 0;
   
   const conversionRate = useMemo(() => {
-    if (totalClientes === 0) return 0;
+    if (totalClientes === 0) return "0.00";
     return ((totalOrders / totalClientes) * 100).toFixed(2);
   }, [totalOrders, totalClientes]);
 
@@ -88,19 +88,19 @@ const Index = () => {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <KPICard
             title="Receita Total"
-            value={`R$ ${totalRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            value={`R$ ${(totalRevenue || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             change={revenueChange}
             trend={revenueChange >= 0 ? "up" : "down"}
             icon={DollarSign}
           />
           <KPICard
             title="Total de Clientes"
-            value={totalClientes.toLocaleString("pt-BR")}
+            value={(totalClientes || 0).toLocaleString("pt-BR")}
             icon={Users}
           />
           <KPICard
             title="Total de Vendas"
-            value={totalOrders.toLocaleString("pt-BR")}
+            value={(totalOrders || 0).toLocaleString("pt-BR")}
             icon={ShoppingCart}
           />
           <KPICard
