@@ -2,11 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useMemo } from "react";
 
 interface Order {
   id: string;
   customer: string;
-  amount: string;
+  amount: number;
   status: string;
 }
 
@@ -15,40 +18,19 @@ interface DataTableProps {
   isLoading?: boolean;
 }
 
-export const DataTable = ({ orders, isLoading }: DataTableProps) => {
-  if (isLoading) {
-    return (
-      <Card className="col-span-2">
-        <CardHeader>
-          <CardTitle>Pedidos Recentes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+const ITEMS_PER_PAGE = 10;
 
-  if (!orders || orders.length === 0) {
-    return (
-      <Card className="col-span-2">
-      <CardHeader>
-        <CardTitle>Pedidos Recentes</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-          Nenhum pedido recente
-        </div>
-        </CardContent>
-      </Card>
-    );
-  }
+export const DataTable = ({ orders, isLoading }: DataTableProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+  
+  const paginatedOrders = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return orders.slice(startIndex, endIndex);
+  }, [orders, currentPage]);
+
   const getStatusColor = (status: string) => {
     const statusLower = status?.toLowerCase() || "";
     if (statusLower.includes("complet") || statusLower.includes("finaliz") || statusLower.includes("pago")) {
@@ -63,10 +45,42 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
     return "bg-muted/10 text-muted-foreground hover:bg-muted/20";
   };
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Pedidos Recentes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[...Array(10)].map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Pedidos Recentes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex h-32 items-center justify-center text-muted-foreground">
+            Nenhum pedido recente
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="col-span-2">
+    <Card>
       <CardHeader>
-        <CardTitle>Pedidos Recentes</CardTitle>
+        <CardTitle>Pedidos Recentes ({orders.length} total)</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -79,22 +93,53 @@ export const DataTable = ({ orders, isLoading }: DataTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {paginatedOrders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.amount}</TableCell>
+                <TableCell>
+                  {new Intl.NumberFormat('pt-BR', { 
+                    style: 'currency', 
+                    currency: 'BRL' 
+                  }).format(order.amount)}
+                </TableCell>
                 <TableCell>
                   <Badge variant="outline" className={getStatusColor(order.status)}>
-                    {order.status === "completed" ? "Concluído" : 
-                     order.status === "pending" ? "Pendente" : 
-                     order.status === "processing" ? "Processando" : order.status}
+                    {order.status}
                   </Badge>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4">
+            <p className="text-sm text-muted-foreground">
+              Página {currentPage} de {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Anterior
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Próxima
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

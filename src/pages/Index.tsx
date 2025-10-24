@@ -1,7 +1,5 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { KPICard } from "@/components/KPICard";
-import { RevenueChart } from "@/components/RevenueChart";
-import { SalesChart } from "@/components/SalesChart";
 import { DataTable } from "@/components/DataTable";
 import { DateFilter } from "@/components/DateFilter";
 import { DollarSign, Users, ShoppingCart, TrendingUp, Loader2 } from "lucide-react";
@@ -14,8 +12,6 @@ import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   calculateTotalRevenue,
-  calculateMonthlyRevenue,
-  calculateSalesByCategory,
   getRecentOrders,
   calculateRevenueChange,
 } from "@/lib/dataProcessing";
@@ -149,16 +145,6 @@ const Index = () => {
     return calculateRevenueChange(vendasFiltradas);
   }, [vendasFiltradas]);
 
-  const monthlyRevenueData = useMemo(() => {
-    if (!vendasFiltradas?.length) return [];
-    return calculateMonthlyRevenue(vendasFiltradas);
-  }, [vendasFiltradas]);
-
-  const salesByCategoryData = useMemo(() => {
-    if (!vendasFiltradas?.length) return [];
-    return calculateSalesByCategory(vendasFiltradas);
-  }, [vendasFiltradas]);
-
   const recentOrders = useMemo(() => {
     if (!vendasFiltradas?.length) return [];
     return getRecentOrders(vendasFiltradas);
@@ -247,16 +233,8 @@ const Index = () => {
           />
         </div>
 
-        {/* Charts */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <RevenueChart data={monthlyRevenueData} isLoading={isLoading} />
-          <SalesChart data={salesByCategoryData} isLoading={isLoading} />
-        </div>
-
         {/* Data Table */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <DataTable orders={recentOrders} isLoading={isLoading} />
-        </div>
+        <DataTable orders={recentOrders} isLoading={isLoading} />
       </main>
     </div>
   );

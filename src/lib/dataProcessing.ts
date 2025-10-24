@@ -146,15 +146,14 @@ export const getRecentOrders = (vendas: Venda[]) => {
       
       return dateB.getTime() - dateA.getTime();
     })
-    .slice(0, 5)
     .map((venda) => {
       const pedidoId = (venda.PEDIDO || venda.id)?.toString() || "N/A";
       const totalPedido = getTotalPedido(venda);
       return {
         id: pedidoId,
         customer: venda.CLIENTE_NOME || "Cliente Desconhecido",
-        amount: `R$ ${totalPedido.toFixed(2)}`,
-        status: venda.status || "completed",
+        amount: totalPedido,
+        status: venda.STATUS_PEDIDO || venda.status || "Sem Status",
       };
     });
 };
