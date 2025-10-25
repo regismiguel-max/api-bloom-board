@@ -2,6 +2,7 @@ import { DashboardNav } from "@/components/DashboardNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { useVendas } from "@/hooks/useVendas";
+import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
 import { Loader2, Users, TrendingUp, DollarSign } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
@@ -21,6 +22,70 @@ const AnaliseVendedores = () => {
   const statusList = [];
   const gruposClientes = [];
 
+  // Criar mapa de clientes para enriquecer vendas
+  const { data: clientes = [] } = useClientes();
+
+  const clientesMap = useMemo(() => {
+    const map = new Map();
+    clientes.forEach((cliente) => {
+      if (cliente.CPF_CNPJ) {
+        const docNormalizado = cliente.CPF_CNPJ.replace(/\D/g, '');
+        map.set(docNormalizado, cliente);
+      }
+    });
+    return map;
+  }, [clientes]);
+
+  // Enriquecer vendas com dados dos clientes
+  const vendasEnriquecidas = useMemo(() => {
+    return vendas.map((venda) => {
+      const clienteDoc = venda.CLIENTE_DOC?.replace(/\D/g, '');
+      const cliente = clienteDoc ? clientesMap.get(clienteDoc) : null;
+      
+      return {
+        ...venda,
+        CLIENTE_NOME_GRUPO: cliente?.NOME_GRUPO || null,
+      };
+    });
+  }, [vendas, clientesMap]);
+
+  // Aplicar filtros locais
+  const vendasFiltradas = useMemo(() => {
+    let filtered = vendasEnriquecidas;
+
+    // Filtro por tipo de cliente
+    if (dateFilters.tipoCliente) {
+      filtered = filtered.filter((venda) => {
+        const doc = venda.CLIENTE_DOC;
+        if (!doc) return false;
+        const docLimpo = doc.replace(/\D/g, '');
+        
+        if (dateFilters.tipoCliente === 'pf') {
+          return docLimpo.length === 11;
+        } else if (dateFilters.tipoCliente === 'pj') {
+          return docLimpo.length === 14;
+        }
+        return true;
+      });
+    }
+
+    // Filtro por grupo de cliente
+    if (dateFilters.nomeGrupo) {
+      filtered = filtered.filter((venda) => {
+        return venda.CLIENTE_NOME_GRUPO === dateFilters.nomeGrupo;
+      });
+    }
+
+    // Filtro por vendedor
+    if (dateFilters.vendedor) {
+      filtered = filtered.filter((venda) => {
+        return venda.VENDEDOR_NOME === dateFilters.vendedor;
+      });
+    }
+
+    return filtered;
+  }, [vendasEnriquecidas, dateFilters.tipoCliente, dateFilters.nomeGrupo, dateFilters.vendedor]);
+
   // Lista de vendedores únicos
   const vendedoresList = useMemo(() => {
     const vendedoresSet = new Set<string>();
@@ -38,12 +103,12 @@ const AnaliseVendedores = () => {
 
   // Análise por vendedor
   const analiseVendedores = useMemo(() => {
-    if (!vendas.length) return [];
+    if (!vendasFiltradas.length) return [];
 
-    console.log(`🔍 Analisando ${vendas.length} vendas para vendedores`);
+    console.log(`🔍 Analisando ${vendasFiltradas.length} vendas para vendedores (filtradas)`);
 
     // Filtrar apenas vendas com status OK
-    const vendasOK = vendas.filter(v => v.STATUS_PEDIDO === 'OK');
+    const vendasOK = vendasFiltradas.filter(v => v.STATUS_PEDIDO === 'OK');
     console.log(`✅ Vendas com status OK: ${vendasOK.length}`);
 
     // Agrupar por PEDIDO primeiro para pegar o total correto
@@ -92,7 +157,7 @@ const AnaliseVendedores = () => {
 
     console.log(`🏆 Total vendedores no ranking: ${resultado.length}`);
     return resultado;
-  }, [vendas]);
+  }, [vendasFiltradas]);
 
   // Estatísticas gerais
   const estatisticas = useMemo(() => {
