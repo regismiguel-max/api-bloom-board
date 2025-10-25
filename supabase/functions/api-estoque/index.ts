@@ -53,6 +53,8 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
+    
+    console.log('API Response - Total:', data.total, 'Items:', Array.isArray(data) ? data.length : (data.estoque?.length || 0));
 
     const formattedResponse = {
       estoque: Array.isArray(data) ? data : (data.estoque || []),
