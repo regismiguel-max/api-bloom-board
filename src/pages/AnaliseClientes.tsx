@@ -281,85 +281,42 @@ const AnaliseClientes = () => {
         {/* Análise Detalhada por Cliente */}
         <TabelaAnaliseClientes clientes={clientes} />
 
-        {/* Gráficos em Grid */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Distribuição por Estado */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Distribuição por Estado</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={distribuicaoPorUF}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="uf" 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [value, 'Clientes']}
-                    labelStyle={{ color: 'hsl(var(--foreground))' }}
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px'
-                    }}
-                  />
-                  <Bar 
-                    dataKey="count" 
-                    fill="hsl(var(--primary))"
-                    radius={[8, 8, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Tempo desde Última Compra */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tempo desde Última Compra</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={analiseUltimaCompra.distribuicao}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="faixa" 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={11}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [value, 'Clientes']}
-                    labelStyle={{ color: 'hsl(var(--foreground))' }}
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px'
-                    }}
-                  />
-                  <Bar 
-                    dataKey="count" 
-                    fill="hsl(var(--primary))"
-                    radius={[8, 8, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Distribuição por Estado */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Distribuição por Estado</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={distribuicaoPorUF}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="uf" 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [value, 'Clientes']}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+                <Bar 
+                  dataKey="count" 
+                  fill="hsl(var(--primary))"
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
