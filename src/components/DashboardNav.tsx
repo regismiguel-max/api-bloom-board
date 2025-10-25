@@ -7,7 +7,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 const navItems = [
   { icon: BarChart3, label: "Pedido x Venda", href: "/" },
   { icon: TrendingUp, label: "Análise de Clientes", href: "/analise-clientes" },
-  { icon: Users, label: "Usuários", href: "#" },
+  { icon: Users, label: "Análise de Vendedores", href: "/analise-vendedores" },
   { icon: ShoppingCart, label: "Vendas", href: "#" },
   { icon: Settings, label: "Configurações", href: "#" },
 ];
