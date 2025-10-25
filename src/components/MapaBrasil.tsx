@@ -26,11 +26,11 @@ export const MapaBrasil = ({ distribuicao }: MapaBrasilProps) => {
     
     const intensity = count / maxCount;
     // Gradient de cores do mais claro ao mais escuro
-    if (intensity > 0.8) return "hsl(var(--primary))";
-    if (intensity > 0.6) return "hsl(210, 100%, 50%)";
-    if (intensity > 0.4) return "hsl(210, 100%, 60%)";
-    if (intensity > 0.2) return "hsl(210, 100%, 70%)";
-    return "hsl(210, 100%, 85%)";
+    if (intensity > 0.8) return "hsl(210, 90%, 45%)";
+    if (intensity > 0.6) return "hsl(210, 85%, 55%)";
+    if (intensity > 0.4) return "hsl(210, 80%, 65%)";
+    if (intensity > 0.2) return "hsl(210, 75%, 75%)";
+    return "hsl(210, 70%, 85%)";
   };
 
   const hoveredData = hoveredState ? {
@@ -38,35 +38,35 @@ export const MapaBrasil = ({ distribuicao }: MapaBrasilProps) => {
     count: ufMap.get(hoveredState) || 0
   } : null;
 
-  // Coordenadas mais realistas dos estados brasileiros para o SVG
+  // Coordenadas geográficas simplificadas dos estados brasileiros
   const estados = [
-    { uf: "AC", path: "M 70 290 L 90 290 L 90 315 L 70 315 Z", cx: 80, cy: 302 },
-    { uf: "AL", path: "M 405 315 L 420 315 L 420 332 L 405 332 Z", cx: 412, cy: 323 },
-    { uf: "AP", path: "M 270 95 L 295 95 L 295 125 L 270 125 Z", cx: 282, cy: 110 },
-    { uf: "AM", path: "M 95 200 L 180 200 L 180 310 L 95 310 Z", cx: 137, cy: 255 },
-    { uf: "BA", path: "M 345 310 L 410 310 L 410 375 L 345 375 Z", cx: 377, cy: 342 },
-    { uf: "CE", path: "M 350 230 L 390 230 L 390 260 L 350 260 Z", cx: 370, cy: 245 },
-    { uf: "DF", path: "M 330 355 L 340 355 L 340 365 L 330 365 Z", cx: 335, cy: 360 },
-    { uf: "ES", path: "M 375 410 L 395 410 L 395 425 L 375 425 Z", cx: 385, cy: 417 },
-    { uf: "GO", path: "M 310 340 L 355 340 L 355 390 L 310 390 Z", cx: 332, cy: 365 },
-    { uf: "MA", path: "M 310 200 L 355 200 L 355 260 L 310 260 Z", cx: 332, cy: 230 },
-    { uf: "MT", path: "M 235 270 L 310 270 L 310 355 L 235 355 Z", cx: 272, cy: 312 },
-    { uf: "MS", path: "M 245 370 L 310 370 L 310 425 L 245 425 Z", cx: 277, cy: 397 },
-    { uf: "MG", path: "M 320 380 L 380 380 L 380 430 L 320 430 Z", cx: 350, cy: 405 },
-    { uf: "PA", path: "M 200 170 L 310 170 L 310 265 L 200 265 Z", cx: 255, cy: 217 },
-    { uf: "PB", path: "M 395 260 L 415 260 L 415 275 L 395 275 Z", cx: 405, cy: 267 },
-    { uf: "PR", path: "M 285 430 L 335 430 L 335 460 L 285 460 Z", cx: 310, cy: 445 },
-    { uf: "PE", path: "M 365 275 L 405 275 L 405 310 L 365 310 Z", cx: 385, cy: 292 },
-    { uf: "PI", path: "M 330 240 L 365 240 L 365 295 L 330 295 Z", cx: 347, cy: 267 },
-    { uf: "RJ", path: "M 365 430 L 390 430 L 390 450 L 365 450 Z", cx: 377, cy: 440 },
-    { uf: "RN", path: "M 390 240 L 415 240 L 415 258 L 390 258 Z", cx: 402, cy: 249 },
-    { uf: "RS", path: "M 270 475 L 315 475 L 315 520 L 270 520 Z", cx: 292, cy: 497 },
-    { uf: "RO", path: "M 165 315 L 205 315 L 205 355 L 165 355 Z", cx: 185, cy: 335 },
-    { uf: "RR", path: "M 160 90 L 205 90 L 205 165 L 160 165 Z", cx: 182, cy: 127 },
-    { uf: "SC", path: "M 300 460 L 350 460 L 350 490 L 300 490 Z", cx: 325, cy: 475 },
-    { uf: "SP", path: "M 320 420 L 370 420 L 370 460 L 320 460 Z", cx: 345, cy: 440 },
-    { uf: "SE", path: "M 400 305 L 418 305 L 418 320 L 400 320 Z", cx: 409, cy: 312 },
-    { uf: "TO", path: "M 305 280 L 335 280 L 335 340 L 305 340 Z", cx: 320, cy: 310 },
+    { uf: "RR", path: "M 180 40 L 220 30 L 240 60 L 230 100 L 200 110 L 175 95 L 170 70 Z", cx: 205, cy: 70 },
+    { uf: "AP", path: "M 250 50 L 285 45 L 295 75 L 285 105 L 260 100 L 245 80 Z", cx: 270, cy: 75 },
+    { uf: "AM", path: "M 80 130 L 180 120 L 200 140 L 210 180 L 195 240 L 170 270 L 130 285 L 90 275 L 70 240 L 65 180 Z", cx: 135, cy: 205 },
+    { uf: "PA", path: "M 210 130 L 290 115 L 310 140 L 320 180 L 315 220 L 285 245 L 250 250 L 210 240 L 200 200 L 205 160 Z", cx: 260, cy: 185 },
+    { uf: "MA", path: "M 320 170 L 365 160 L 385 185 L 385 220 L 370 245 L 340 250 L 320 235 Z", cx: 355, cy: 205 },
+    { uf: "PI", path: "M 340 245 L 370 240 L 385 260 L 385 295 L 365 310 L 345 305 L 335 275 Z", cx: 360, cy: 275 },
+    { uf: "CE", path: "M 385 190 L 420 185 L 435 205 L 435 230 L 420 245 L 390 240 Z", cx: 412, cy: 217 },
+    { uf: "RN", path: "M 420 235 L 445 230 L 455 245 L 450 260 L 425 258 Z", cx: 437, cy: 247 },
+    { uf: "PB", path: "M 425 258 L 450 255 L 455 270 L 445 280 L 425 278 Z", cx: 440, cy: 268 },
+    { uf: "PE", path: "M 385 250 L 425 245 L 440 265 L 440 290 L 420 305 L 390 300 L 380 275 Z", cx: 410, cy: 278 },
+    { uf: "AL", path: "M 420 300 L 440 295 L 445 315 L 435 330 L 418 328 Z", cx: 432, cy: 315 },
+    { uf: "SE", path: "M 418 323 L 435 320 L 440 335 L 430 345 L 415 343 Z", cx: 427, cy: 333 },
+    { uf: "BA", path: "M 345 305 L 390 295 L 420 310 L 430 340 L 425 375 L 400 405 L 370 415 L 340 410 L 320 385 L 315 345 L 325 320 Z", cx: 370, cy: 355 },
+    { uf: "TO", path: "M 315 250 L 345 245 L 355 275 L 355 320 L 340 350 L 320 355 L 305 330 L 300 280 Z", cx: 327, cy: 300 },
+    { uf: "MT", path: "M 200 250 L 285 240 L 310 260 L 315 310 L 305 350 L 280 370 L 245 375 L 210 365 L 190 330 L 185 280 Z", cx: 255, cy: 305 },
+    { uf: "RO", path: "M 135 285 L 175 275 L 195 295 L 195 330 L 175 350 L 145 355 L 125 340 L 120 310 Z", cx: 155, cy: 318 },
+    { uf: "AC", path: "M 65 270 L 95 265 L 110 285 L 110 310 L 90 325 L 65 320 L 55 295 Z", cx: 82, cy: 295 },
+    { uf: "GO", path: "M 305 350 L 340 345 L 355 365 L 355 395 L 340 410 L 315 410 L 295 395 L 290 370 Z", cx: 322, cy: 378 },
+    { uf: "DF", path: "M 338 367 L 345 365 L 348 372 L 345 378 L 338 376 Z", cx: 342, cy: 371 },
+    { uf: "MS", path: "M 245 375 L 290 370 L 305 390 L 305 425 L 285 445 L 255 450 L 230 440 L 220 410 L 225 390 Z", cx: 262, cy: 412 },
+    { uf: "MG", path: "M 315 405 L 370 410 L 400 425 L 410 455 L 400 480 L 370 485 L 335 480 L 310 465 L 305 435 Z", cx: 355, cy: 447 },
+    { uf: "ES", path: "M 400 475 L 415 470 L 425 485 L 420 500 L 405 505 L 395 495 Z", cx: 410, cy: 487 },
+    { uf: "RJ", path: "M 370 485 L 405 480 L 415 495 L 410 515 L 390 520 L 365 510 L 360 495 Z", cx: 387, cy: 500 },
+    { uf: "SP", path: "M 305 460 L 365 455 L 390 470 L 390 500 L 370 515 L 340 520 L 310 510 L 295 485 Z", cx: 342, cy: 487 },
+    { uf: "PR", path: "M 285 505 L 340 500 L 365 515 L 365 540 L 340 550 L 305 545 L 280 530 Z", cx: 320, cy: 527 },
+    { uf: "SC", path: "M 305 545 L 350 540 L 370 555 L 365 575 L 340 580 L 310 572 L 300 560 Z", cx: 335, cy: 562 },
+    { uf: "RS", path: "M 280 575 L 320 570 L 340 585 L 340 615 L 320 635 L 285 640 L 260 625 L 255 595 Z", cx: 300, cy: 607 },
   ];
 
   return (
@@ -76,7 +76,7 @@ export const MapaBrasil = ({ distribuicao }: MapaBrasilProps) => {
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <svg viewBox="0 0 480 560" className="w-full h-auto max-w-md mx-auto">
+          <svg viewBox="0 0 500 680" className="w-full h-auto max-w-lg mx-auto" style={{ maxHeight: '600px' }}>
             {/* Estados */}
             {estados.map((estado) => (
               <g key={estado.uf}>
@@ -117,23 +117,23 @@ export const MapaBrasil = ({ distribuicao }: MapaBrasilProps) => {
           {/* Legenda */}
           <div className="mt-4 flex flex-wrap items-center gap-4 justify-center">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 100%, 85%)" }} />
+              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 70%, 85%)" }} />
               <span className="text-xs">Baixa</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 100%, 70%)" }} />
+              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 75%, 75%)" }} />
               <span className="text-xs">Média-Baixa</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 100%, 60%)" }} />
+              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 80%, 65%)" }} />
               <span className="text-xs">Média</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 100%, 50%)" }} />
+              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 85%, 55%)" }} />
               <span className="text-xs">Média-Alta</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(var(--primary))" }} />
+              <div className="w-6 h-6 rounded" style={{ backgroundColor: "hsl(210, 90%, 45%)" }} />
               <span className="text-xs">Alta</span>
             </div>
             <div className="flex items-center gap-2">
