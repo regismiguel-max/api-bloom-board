@@ -87,8 +87,8 @@ const AnaliseEstoque = () => {
     return (
       <div className="flex min-h-screen bg-background">
         <DashboardNav />
-        <div className="flex-1 p-8 ml-0 lg:ml-64">
-          <h1 className="text-3xl font-bold mb-8 text-foreground">Análise de Estoque</h1>
+        <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 w-full overflow-x-hidden">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-foreground">Análise de Estoque</h1>
           
           <div className="flex flex-col items-center justify-center py-20">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4" />
@@ -102,8 +102,8 @@ const AnaliseEstoque = () => {
   return (
     <div className="flex min-h-screen bg-background">
       <DashboardNav />
-      <div className="flex-1 p-8 ml-0 lg:ml-64">
-        <h1 className="text-3xl font-bold mb-8 text-foreground">Análise de Estoque</h1>
+      <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 w-full overflow-x-hidden">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-foreground">Análise de Estoque</h1>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

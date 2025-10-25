@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, BarChart3 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { z } from "zod";
+import convergeLogo from "@/assets/converge-logo.png";
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: "Email inválido" }).max(255),
@@ -72,26 +73,29 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-primary p-4 sm:p-6 md:p-8">
+      <div className="w-full max-w-md space-y-6 sm:space-y-8">
         {/* Logo e Título */}
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <BarChart3 className="h-8 w-8 text-primary" />
+        <div className="text-center space-y-3 sm:space-y-4">
+          <div className="flex justify-center mb-3 sm:mb-4">
+            <div className="bg-card p-4 sm:p-6 rounded-2xl shadow-glow">
+              <img src={convergeLogo} alt="Converge Logo" className="h-16 w-auto sm:h-20" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics BI</h1>
-          <p className="text-muted-foreground">
+          <div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">CONVERGE</h1>
+            <p className="text-sm sm:text-base text-white/80 mt-1">Soluções em Saúde</p>
+          </div>
+          <p className="text-sm sm:text-base text-white/70">
             {isLogin ? 'Entre com sua conta' : 'Crie sua conta'}
           </p>
         </div>
 
         {/* Card de Login/Cadastro */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{isLogin ? 'Login' : 'Criar Conta'}</CardTitle>
-            <CardDescription>
+        <Card className="shadow-xl">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-xl sm:text-2xl">{isLogin ? 'Login' : 'Criar Conta'}</CardTitle>
+            <CardDescription className="text-sm">
               {isLogin 
                 ? 'Entre com seu email e senha para acessar o sistema' 
                 : 'Preencha os dados abaixo para criar sua conta'}
@@ -106,7 +110,7 @@ const Auth = () => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -114,15 +118,15 @@ const Auth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className={validationErrors.email ? 'border-destructive' : ''}
+                  className={`text-sm sm:text-base ${validationErrors.email ? 'border-destructive' : ''}`}
                 />
                 {validationErrors.email && (
-                  <p className="text-sm text-destructive">{validationErrors.email}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{validationErrors.email}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+                <Label htmlFor="password" className="text-sm sm:text-base">Senha</Label>
                 <Input
                   id="password"
                   type="password"
@@ -130,20 +134,20 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className={validationErrors.password ? 'border-destructive' : ''}
+                  className={`text-sm sm:text-base ${validationErrors.password ? 'border-destructive' : ''}`}
                 />
                 {validationErrors.password && (
-                  <p className="text-sm text-destructive">{validationErrors.password}</p>
+                  <p className="text-xs sm:text-sm text-destructive">{validationErrors.password}</p>
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full text-sm sm:text-base h-10 sm:h-11" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isLogin ? 'Entrar' : 'Criar Conta'}
               </Button>
             </form>
 
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-4 text-center text-xs sm:text-sm">
               <button
                 type="button"
                 onClick={() => {
@@ -151,7 +155,7 @@ const Auth = () => {
                   setError("");
                   setValidationErrors({});
                 }}
-                className="text-primary hover:underline"
+                className="text-primary hover:underline font-medium transition-colors"
                 disabled={isLoading}
               >
                 {isLogin 
@@ -164,9 +168,9 @@ const Auth = () => {
 
         {/* Instruções para Admin */}
         {!isLogin && (
-          <Card className="border-primary/20">
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground text-center">
+          <Card className="border-primary/20 shadow-md bg-card/95">
+            <CardContent className="pt-4 sm:pt-6">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center leading-relaxed">
                 <strong>Nota:</strong> Novos usuários são criados como "user". 
                 Para ter acesso de admin, entre em contato com o administrador do sistema.
               </p>

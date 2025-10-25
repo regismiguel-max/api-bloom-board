@@ -218,14 +218,14 @@ const AnaliseClientes = () => {
   ];
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen">
       <DashboardNav />
       
-      <main className="flex-1 md:ml-64 p-6 md:p-8 space-y-8">
+      <main className="flex-1 lg:ml-64 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Análise de Clientes</h1>
-          <p className="text-muted-foreground">Ranking e distribuição geográfica dos clientes.</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Análise de Clientes</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Ranking e distribuição geográfica dos clientes.</p>
         </div>
 
         {/* Filtro de Data */}
