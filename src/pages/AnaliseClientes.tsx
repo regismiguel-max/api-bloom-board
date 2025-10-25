@@ -120,7 +120,7 @@ const AnaliseClientes = () => {
     return resultado;
   }, [vendasEnriquecidas]);
 
-  // Distribuição por UF
+  // Distribuição por UF - TODOS os estados
   const distribuicaoPorUF = useMemo(() => {
     if (!clientes.length) return [];
 
@@ -133,8 +133,7 @@ const AnaliseClientes = () => {
 
     return Array.from(ufCount.entries())
       .map(([uf, count]) => ({ uf, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10); // Top 10 estados
+      .sort((a, b) => b.count - a.count); // Todos os estados, ordenados
   }, [clientes]);
 
   const totalClientesAtivos = useMemo(() => {
@@ -210,19 +209,22 @@ const AnaliseClientes = () => {
           {/* Distribuição por UF */}
           <Card>
             <CardHeader>
-              <CardTitle>Distribuição por Estado (Top 10)</CardTitle>
+              <CardTitle>Distribuição por Estado</CardTitle>
             </CardHeader>
             <CardContent>
               {distribuicaoPorUF.length > 0 ? (
                 <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={distribuicaoPorUF}>
+                  <BarChart data={distribuicaoPorUF} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis 
-                      dataKey="uf" 
+                      type="number"
                       stroke="hsl(var(--muted-foreground))"
                     />
                     <YAxis 
+                      dataKey="uf" 
+                      type="category"
                       stroke="hsl(var(--muted-foreground))"
+                      width={50}
                     />
                     <Tooltip 
                       contentStyle={{
@@ -232,7 +234,7 @@ const AnaliseClientes = () => {
                       }}
                       formatter={(value) => [`${value} clientes`, 'Total']}
                     />
-                    <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                    <Bar dataKey="count" radius={[0, 8, 8, 0]}>
                       {distribuicaoPorUF.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}

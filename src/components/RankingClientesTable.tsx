@@ -52,7 +52,7 @@ export const RankingClientesTable = ({ clientes }: RankingClientesTableProps) =>
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ranking de Clientes (Pedidos OK)</CardTitle>
+        <CardTitle>Ranking de Clientes</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
