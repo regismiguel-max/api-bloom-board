@@ -32,7 +32,7 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
     return dias >= 0 ? dias : null;
   };
 
-  // Filtrar apenas clientes com ULTIMA_COMPRA e ordenar por dias sem comprar (maior primeiro)
+  // Filtrar apenas clientes com ULTIMA_COMPRA e ordenar por dias sem comprar (menor primeiro - mais ativos)
   const clientesComDatas = useMemo(() => {
     return clientes
       .filter(c => c.ULTIMA_COMPRA)
@@ -40,7 +40,7 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
         ...c,
         diasSemComprar: calcularDiasSemComprar(c.ULTIMA_COMPRA)
       }))
-      .sort((a, b) => (b.diasSemComprar || 0) - (a.diasSemComprar || 0));
+      .sort((a, b) => (a.diasSemComprar || 0) - (b.diasSemComprar || 0));
   }, [clientes]);
 
   const totalPages = Math.ceil(clientesComDatas.length / ITEMS_PER_PAGE);
