@@ -10,7 +10,7 @@ interface TabelaAnaliseClientesProps {
   clientes: Cliente[];
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
 
 export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,7 +24,7 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
     }
   };
 
-  const calcularDias = (dataStr: string | undefined): number | null => {
+  const calcularDiasSemComprar = (dataStr: string | undefined): number | null => {
     const data = parseData(dataStr);
     if (!data || isNaN(data.getTime())) return null;
     const hoje = new Date();
@@ -32,9 +32,15 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
     return dias >= 0 ? dias : null;
   };
 
-  // Filtrar apenas clientes com ULTIMA_COMPRA
+  // Filtrar apenas clientes com ULTIMA_COMPRA e ordenar por dias sem comprar (maior primeiro)
   const clientesComDatas = useMemo(() => {
-    return clientes.filter(c => c.ULTIMA_COMPRA);
+    return clientes
+      .filter(c => c.ULTIMA_COMPRA)
+      .map(c => ({
+        ...c,
+        diasSemComprar: calcularDiasSemComprar(c.ULTIMA_COMPRA)
+      }))
+      .sort((a, b) => (b.diasSemComprar || 0) - (a.diasSemComprar || 0));
   }, [clientes]);
 
   const totalPages = Math.ceil(clientesComDatas.length / ITEMS_PER_PAGE);
@@ -75,56 +81,36 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[60px]">#</TableHead>
                 <TableHead>Cliente</TableHead>
-                <TableHead>Data Cadastro</TableHead>
-                <TableHead className="text-center">Dias desde Cadastro</TableHead>
-                <TableHead>Última Compra</TableHead>
-                <TableHead className="text-center">Dias</TableHead>
-                <TableHead>Penúltima Compra</TableHead>
-                <TableHead className="text-center">Dias</TableHead>
-                <TableHead>Terceira Compra</TableHead>
-                <TableHead className="text-center">Dias</TableHead>
+                <TableHead>UF</TableHead>
+                <TableHead className="text-center">Última Compra</TableHead>
+                <TableHead className="text-center">Dias sem Comprar</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedClientes.map((cliente, index) => {
+                const posicaoGeral = (currentPage - 1) * ITEMS_PER_PAGE + index + 1;
                 const nomeCliente = cliente.NOME_CLIENTE || cliente.NOME || cliente.nome || 'Cliente Desconhecido';
-                const diasCadastro = calcularDias(cliente.DATA_CADASTRO);
-                const diasUltima = calcularDias(cliente.ULTIMA_COMPRA);
-                const diasPenultima = calcularDias(cliente.PENULTIMA_COMPRA);
-                const diasTerceira = calcularDias(cliente.TERCEIRA_COMPRA);
+                const uf = cliente.UF || '-';
+                const diasSemComprar = cliente.diasSemComprar;
 
                 return (
                   <TableRow key={cliente.CODIGO_CLIENTE || index}>
+                    <TableCell className="text-muted-foreground text-sm">{posicaoGeral}</TableCell>
                     <TableCell className="font-medium">{nomeCliente}</TableCell>
-                    <TableCell className="text-sm">{cliente.DATA_CADASTRO || '-'}</TableCell>
-                    <TableCell className="text-center text-sm">
-                      {diasCadastro !== null ? (
-                        <span className="font-semibold">{diasCadastro}</span>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell className="text-sm">{cliente.ULTIMA_COMPRA || '-'}</TableCell>
-                    <TableCell className="text-center text-sm">
-                      {diasUltima !== null ? (
-                        <span className={`font-semibold ${
-                          diasUltima > 90 ? 'text-destructive' : 
-                          diasUltima > 60 ? 'text-orange-500' : 
+                    <TableCell className="text-sm">{uf}</TableCell>
+                    <TableCell className="text-center text-sm">{cliente.ULTIMA_COMPRA || '-'}</TableCell>
+                    <TableCell className="text-center">
+                      {diasSemComprar !== null ? (
+                        <span className={`font-bold text-base ${
+                          diasSemComprar > 180 ? 'text-destructive' : 
+                          diasSemComprar > 90 ? 'text-orange-500' : 
+                          diasSemComprar > 60 ? 'text-yellow-600' :
                           'text-green-600'
                         }`}>
-                          {diasUltima}
+                          {diasSemComprar}
                         </span>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell className="text-sm">{cliente.PENULTIMA_COMPRA || '-'}</TableCell>
-                    <TableCell className="text-center text-sm">
-                      {diasPenultima !== null ? (
-                        <span className="font-semibold">{diasPenultima}</span>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell className="text-sm">{cliente.TERCEIRA_COMPRA || '-'}</TableCell>
-                    <TableCell className="text-center text-sm">
-                      {diasTerceira !== null ? (
-                        <span className="font-semibold">{diasTerceira}</span>
                       ) : '-'}
                     </TableCell>
                   </TableRow>
@@ -173,3 +159,4 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
     </Card>
   );
 };
+
