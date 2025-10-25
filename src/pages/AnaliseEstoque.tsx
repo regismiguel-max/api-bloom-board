@@ -25,8 +25,8 @@ const AnaliseEstoque = () => {
   const itemsPerPage = 10;
   
   const { data, isLoading } = useEstoque({ 
-    page: currentPage, 
-    limit: itemsPerPage,
+    page: 1, 
+    limit: 0, // Busca todos para filtrar no cliente
     ...appliedFilters
   });
   const { data: allData } = useEstoque({ page: 1, limit: 0 }); // Busca todos para KPIs
@@ -34,16 +34,31 @@ const AnaliseEstoque = () => {
   // Ordena produtos por estoque decrescente (maior para menor)
   let estoque = (data?.estoque || []).sort((a, b) => (b.ESTOQUE_ATUAL || 0) - (a.ESTOQUE_ATUAL || 0));
   
-  // Filtro adicional no cliente quando min e max são iguais
-  if (appliedFilters.estoqueMin !== undefined && appliedFilters.estoqueMax !== undefined) {
-    if (appliedFilters.estoqueMin === appliedFilters.estoqueMax) {
-      // Se min e max são iguais, filtra apenas produtos com estoque exatamente igual
-      estoque = estoque.filter(item => (item.ESTOQUE_ATUAL || 0) === appliedFilters.estoqueMin);
-    }
+  // Filtro adicional no cliente para garantir intervalo correto
+  if (appliedFilters.estoqueMin !== undefined || appliedFilters.estoqueMax !== undefined) {
+    estoque = estoque.filter(item => {
+      const qtd = item.ESTOQUE_ATUAL || 0;
+      
+      // Se ambos min e max são iguais, filtra exatamente igual
+      if (appliedFilters.estoqueMin !== undefined && 
+          appliedFilters.estoqueMax !== undefined && 
+          appliedFilters.estoqueMin === appliedFilters.estoqueMax) {
+        return qtd === appliedFilters.estoqueMin;
+      }
+      
+      // Se é um intervalo, filtra entre min e max (inclusive)
+      const meetsMin = appliedFilters.estoqueMin === undefined || qtd >= appliedFilters.estoqueMin;
+      const meetsMax = appliedFilters.estoqueMax === undefined || qtd <= appliedFilters.estoqueMax;
+      return meetsMin && meetsMax;
+    });
   }
   
-  const totalItens = data?.total || 0;
+  const totalItens = estoque.length; // Total após filtros no cliente
   const totalPages = Math.ceil(totalItens / itemsPerPage);
+  
+  // Aplica paginação no cliente
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedEstoque = estoque.slice(startIndex, startIndex + itemsPerPage);
   
   // KPIs calculados com TODOS os dados da base
   const allEstoque = allData?.estoque || [];
@@ -199,8 +214,8 @@ const AnaliseEstoque = () => {
                       </div>
                     </TableCell>
                   </TableRow>
-                ) : estoque.length > 0 ? (
-                  estoque.map((item, index) => (
+                ) : paginatedEstoque.length > 0 ? (
+                  paginatedEstoque.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-mono text-sm">
                         {item.CODIGO_PRO}
