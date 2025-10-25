@@ -48,7 +48,7 @@ const AnaliseVendedores = () => {
     const vendedorVendas = new Map<string, { nome: string; total: number; pedidos: number; clientes: Set<string> }>();
 
     pedidosUnicos.forEach((venda) => {
-      const vendedor = venda.VENDEDOR || 'Vendedor Desconhecido';
+      const vendedor = venda.VENDEDOR_NOME || 'Vendedor Desconhecido';
       const clienteDoc = venda.CLIENTE_DOC?.replace(/\D/g, '');
       
       const existing = vendedorVendas.get(vendedor) || { 
