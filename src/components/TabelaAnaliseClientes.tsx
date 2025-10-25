@@ -11,7 +11,7 @@ interface TabelaAnaliseClientesProps {
   clientes: Cliente[];
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 10;
 
 export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) => {
   const [currentPage, setCurrentPage] = useState(1);
