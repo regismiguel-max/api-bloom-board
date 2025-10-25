@@ -177,6 +177,17 @@ const Auth = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Link para instalação */}
+        <Card className="border-primary/20 shadow-md bg-card/95">
+          <CardContent className="pt-4 sm:pt-6">
+            <p className="text-xs sm:text-sm text-center">
+              <a href="/install" className="text-primary hover:underline font-medium">
+                📱 Instalar como aplicativo no celular
+              </a>
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

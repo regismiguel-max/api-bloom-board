@@ -11,6 +11,7 @@ import AnaliseVendedores from "./pages/AnaliseVendedores";
 import AnaliseEstoque from "./pages/AnaliseEstoque";
 import CarteiraClientes from "./pages/CarteiraClientes";
 import Auth from "./pages/Auth";
+import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/analise-clientes" element={<ProtectedRoute><AnaliseClientes /></ProtectedRoute>} />
             <Route path="/analise-vendedores" element={<ProtectedRoute><AnaliseVendedores /></ProtectedRoute>} />
