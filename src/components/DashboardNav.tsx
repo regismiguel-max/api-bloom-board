@@ -12,7 +12,7 @@ const navItems = [
   { icon: Users, label: "Análise de Vendedores", href: "/analise-vendedores" },
   { icon: ShoppingCart, label: "Análise de Estoque", href: "/analise-estoque" },
   { icon: Briefcase, label: "Carteira de Clientes", href: "/carteira-clientes" },
-  { icon: Settings, label: "Configurações", href: "#" },
+  { icon: Settings, label: "Configurações", href: "/configuracoes" },
 ];
 
 export const DashboardNav = () => {

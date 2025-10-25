@@ -10,6 +10,7 @@ import AnaliseClientes from "./pages/AnaliseClientes";
 import AnaliseVendedores from "./pages/AnaliseVendedores";
 import AnaliseEstoque from "./pages/AnaliseEstoque";
 import CarteiraClientes from "./pages/CarteiraClientes";
+import Configuracoes from "./pages/Configuracoes";
 import Auth from "./pages/Auth";
 import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/analise-vendedores" element={<ProtectedRoute><AnaliseVendedores /></ProtectedRoute>} />
             <Route path="/analise-estoque" element={<ProtectedRoute><AnaliseEstoque /></ProtectedRoute>} />
             <Route path="/carteira-clientes" element={<ProtectedRoute><CarteiraClientes /></ProtectedRoute>} />
+            <Route path="/configuracoes" element={<ProtectedRoute><Configuracoes /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
