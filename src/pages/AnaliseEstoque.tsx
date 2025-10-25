@@ -32,7 +32,16 @@ const AnaliseEstoque = () => {
   const { data: allData } = useEstoque({ page: 1, limit: 0 }); // Busca todos para KPIs
 
   // Ordena produtos por estoque decrescente (maior para menor)
-  const estoque = (data?.estoque || []).sort((a, b) => (b.ESTOQUE_ATUAL || 0) - (a.ESTOQUE_ATUAL || 0));
+  let estoque = (data?.estoque || []).sort((a, b) => (b.ESTOQUE_ATUAL || 0) - (a.ESTOQUE_ATUAL || 0));
+  
+  // Filtro adicional no cliente quando min e max são iguais
+  if (appliedFilters.estoqueMin !== undefined && appliedFilters.estoqueMax !== undefined) {
+    if (appliedFilters.estoqueMin === appliedFilters.estoqueMax) {
+      // Se min e max são iguais, filtra apenas produtos com estoque exatamente igual
+      estoque = estoque.filter(item => (item.ESTOQUE_ATUAL || 0) === appliedFilters.estoqueMin);
+    }
+  }
+  
   const totalItens = data?.total || 0;
   const totalPages = Math.ceil(totalItens / itemsPerPage);
   
