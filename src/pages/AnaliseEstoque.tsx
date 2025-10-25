@@ -31,7 +31,8 @@ const AnaliseEstoque = () => {
   });
   const { data: allData } = useEstoque({ page: 1, limit: 0 }); // Busca todos para KPIs
 
-  const estoque = data?.estoque || [];
+  // Ordena produtos por estoque decrescente (maior para menor)
+  const estoque = (data?.estoque || []).sort((a, b) => (b.ESTOQUE_ATUAL || 0) - (a.ESTOQUE_ATUAL || 0));
   const totalItens = data?.total || 0;
   const totalPages = Math.ceil(totalItens / itemsPerPage);
   
