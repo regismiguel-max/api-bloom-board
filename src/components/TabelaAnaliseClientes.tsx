@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useState, useMemo } from "react";
 import { differenceInDays, parse } from "date-fns";
 import { Cliente } from "@/hooks/useClientes";
@@ -14,6 +15,7 @@ const ITEMS_PER_PAGE = 20;
 
 export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const parseData = (dataStr: string | undefined): Date | null => {
     if (!dataStr) return null;
@@ -32,16 +34,26 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
     return dias >= 0 ? dias : null;
   };
 
-  // Filtrar apenas clientes com ULTIMA_COMPRA e ordenar por dias sem comprar (menor primeiro - mais ativos)
+  // Filtrar por busca e ordenar por dias sem comprar (menor primeiro - mais ativos)
   const clientesComDatas = useMemo(() => {
-    return clientes
+    const filteredClientes = clientes
       .filter(c => c.ULTIMA_COMPRA)
       .map(c => ({
         ...c,
-        diasSemComprar: calcularDiasSemComprar(c.ULTIMA_COMPRA)
+        diasSemComprar: calcularDiasSemComprar(c.ULTIMA_COMPRA),
+        nomeCliente: c.NOME_CLIENTE || c.NOME || c.nome || 'Cliente Desconhecido'
       }))
+      .filter(c => {
+        if (!searchTerm.trim()) return true;
+        const searchLower = searchTerm.toLowerCase();
+        return c.nomeCliente.toLowerCase().includes(searchLower) ||
+               (c.UF && c.UF.toLowerCase().includes(searchLower)) ||
+               (c.CPF_CNPJ && c.CPF_CNPJ.includes(searchTerm));
+      })
       .sort((a, b) => (a.diasSemComprar || 0) - (b.diasSemComprar || 0));
-  }, [clientes]);
+    
+    return filteredClientes;
+  }, [clientes, searchTerm]);
 
   const totalPages = Math.ceil(clientesComDatas.length / ITEMS_PER_PAGE);
   
@@ -75,6 +87,20 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
     <Card>
       <CardHeader>
         <CardTitle>Análise Detalhada por Cliente</CardTitle>
+        <div className="mt-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome, UF ou CPF/CNPJ..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset para primeira página ao buscar
+              }}
+              className="pl-10"
+            />
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -91,7 +117,7 @@ export const TabelaAnaliseClientes = ({ clientes }: TabelaAnaliseClientesProps) 
             <TableBody>
               {paginatedClientes.map((cliente, index) => {
                 const posicaoGeral = (currentPage - 1) * ITEMS_PER_PAGE + index + 1;
-                const nomeCliente = cliente.NOME_CLIENTE || cliente.NOME || cliente.nome || 'Cliente Desconhecido';
+                const nomeCliente = cliente.nomeCliente;
                 const uf = cliente.UF || '-';
                 const diasSemComprar = cliente.diasSemComprar;
 
