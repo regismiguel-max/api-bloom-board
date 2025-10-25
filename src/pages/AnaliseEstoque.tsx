@@ -22,7 +22,7 @@ const AnaliseEstoque = () => {
   const [estoqueMin, setEstoqueMin] = useState<string>("");
   const [estoqueMax, setEstoqueMax] = useState<string>("");
   const [appliedFilters, setAppliedFilters] = useState<{ estoqueMin?: number; estoqueMax?: number }>({});
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
   
   const { data, isLoading } = useEstoque({ 
     page: currentPage, 
