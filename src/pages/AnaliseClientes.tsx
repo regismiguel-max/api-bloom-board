@@ -2,10 +2,11 @@ import { DashboardNav } from "@/components/DashboardNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { RankingClientesTable } from "@/components/RankingClientesTable";
+import { TabelaAnaliseClientes } from "@/components/TabelaAnaliseClientes";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
-import { Loader2, MapPin, Users, Calendar, Clock } from "lucide-react";
+import { Loader2, MapPin, Users, Calendar } from "lucide-react";
 import { format, startOfMonth, endOfMonth, differenceInDays, parse } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -241,7 +242,7 @@ const AnaliseClientes = () => {
         )}
 
         {/* KPIs */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
@@ -272,21 +273,13 @@ const AnaliseClientes = () => {
               <p className="text-xs text-muted-foreground mt-1">dias em média</p>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Clientes Inativos</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analiseUltimaCompra.clientesInativos}</div>
-              <p className="text-xs text-muted-foreground mt-1">+90 dias sem comprar</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Ranking de Clientes */}
         <RankingClientesTable clientes={rankingClientes} />
+
+        {/* Análise Detalhada por Cliente */}
+        <TabelaAnaliseClientes clientes={clientes} />
 
         {/* Gráficos em Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
