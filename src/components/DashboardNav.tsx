@@ -1,8 +1,9 @@
-import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Menu, Briefcase } from "lucide-react";
+import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Menu, Briefcase, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { icon: BarChart3, label: "Pedido x Venda", href: "/" },
@@ -17,6 +18,7 @@ export const DashboardNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <>
@@ -72,16 +74,27 @@ export const DashboardNav = () => {
           </nav>
 
           {/* User info */}
-          <div className="border-t border-sidebar-border p-4">
+          <div className="border-t border-sidebar-border p-4 space-y-2">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-primary text-sidebar-primary-foreground font-medium">
-                JS
+                {user?.email?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-sidebar-foreground">João Silva</p>
-                <p className="text-xs text-sidebar-foreground/60">Administrador</p>
+                <p className="text-sm font-medium text-sidebar-foreground truncate">
+                  {user?.email || 'Usuário'}
+                </p>
+                <p className="text-xs text-sidebar-foreground/60">Autenticado</p>
               </div>
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+              onClick={() => signOut()}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
           </div>
         </div>
       </aside>
