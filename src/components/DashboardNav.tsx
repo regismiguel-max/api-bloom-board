@@ -8,7 +8,7 @@ const navItems = [
   { icon: BarChart3, label: "Pedido x Venda", href: "/" },
   { icon: TrendingUp, label: "Análise de Clientes", href: "/analise-clientes" },
   { icon: Users, label: "Análise de Vendedores", href: "/analise-vendedores" },
-  { icon: ShoppingCart, label: "Vendas", href: "#" },
+  { icon: ShoppingCart, label: "Análise de Estoque", href: "/analise-estoque" },
   { icon: Settings, label: "Configurações", href: "#" },
 ];
 
