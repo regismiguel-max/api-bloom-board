@@ -1,10 +1,11 @@
 import { DashboardNav } from "@/components/DashboardNav";
+import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
-import { Loader2, Users, TrendingUp, DollarSign, Eye } from "lucide-react";
+import { Loader2, Users, TrendingUp, DollarSign, Eye, Award } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -192,15 +193,15 @@ const AnaliseVendedores = () => {
   }, [analiseVendedores]);
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
       <DashboardNav />
       
-      <main className="flex-1 lg:ml-64 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Análise de Vendedores</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Performance e ranking dos vendedores.</p>
-        </div>
+      <main className="flex-1 lg:ml-64 pt-16 md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
+        <PageHeader 
+          title="Análise de Vendedores"
+          description="Performance detalhada e ranking completo dos vendedores"
+          icon={<Award className="h-6 w-6 text-primary" />}
+        />
 
         {/* Filtro de Data */}
         <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} vendedores={vendedoresList} hideStatusFilter={true} />

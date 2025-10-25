@@ -1,9 +1,10 @@
 import { DashboardNav } from "@/components/DashboardNav";
+import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
-import { Loader2, Users, TrendingUp, Search } from "lucide-react";
+import { Loader2, Users, TrendingUp, Search, Briefcase } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -172,15 +173,15 @@ const CarteiraClientes = () => {
   }, [carteiraVendedores, todosClientesComVendedor]);
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
       <DashboardNav />
       
-      <main className="flex-1 lg:ml-64 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Carteira de Clientes</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Clientes atendidos por cada vendedor.</p>
-        </div>
+      <main className="flex-1 lg:ml-64 pt-16 md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
+        <PageHeader 
+          title="Carteira de Clientes"
+          description="Visão completa dos clientes atendidos por cada vendedor"
+          icon={<Briefcase className="h-6 w-6 text-primary" />}
+        />
 
         {/* Loading indicator */}
         {isLoading && (

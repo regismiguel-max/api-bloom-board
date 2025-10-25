@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  devOptions: {
+    enabled: false // Remove o badge "Edit with Lovable"
+  },
   plugins: [
     react(),
     mode === "development" && componentTagger(),

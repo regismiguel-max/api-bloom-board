@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useEstoque } from "@/hooks/useEstoque";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, AlertTriangle, TrendingUp, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Package, AlertTriangle, TrendingUp, ChevronLeft, ChevronRight, Search, Box } from "lucide-react";
 import { DashboardNav } from "@/components/DashboardNav";
+import { PageHeader } from "@/components/PageHeader";
 import {
   Table,
   TableBody,
@@ -87,8 +88,12 @@ const AnaliseEstoque = () => {
     return (
       <div className="flex min-h-screen bg-background">
         <DashboardNav />
-        <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 w-full overflow-x-hidden">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-foreground">Análise de Estoque</h1>
+        <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 pt-16 md:pt-0 w-full overflow-x-hidden">
+          <PageHeader 
+            title="Análise de Estoque"
+            description="Controle completo do estoque de produtos"
+            icon={<Box className="h-6 w-6 text-primary" />}
+          />
           
           <div className="flex flex-col items-center justify-center py-20">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4" />
@@ -102,8 +107,12 @@ const AnaliseEstoque = () => {
   return (
     <div className="flex min-h-screen bg-background">
       <DashboardNav />
-      <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 w-full overflow-x-hidden">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-foreground">Análise de Estoque</h1>
+      <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 pt-16 md:pt-0 w-full overflow-x-hidden">
+        <PageHeader 
+          title="Análise de Estoque"
+          description="Controle completo do estoque de produtos"
+          icon={<Box className="h-6 w-6 text-primary" />}
+        />
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

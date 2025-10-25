@@ -1,4 +1,5 @@
 import { DashboardNav } from "@/components/DashboardNav";
+import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { RankingClientesTable } from "@/components/RankingClientesTable";
@@ -6,7 +7,7 @@ import { TabelaAnaliseClientes } from "@/components/TabelaAnaliseClientes";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
-import { Loader2, MapPin, Users, Calendar } from "lucide-react";
+import { Loader2, MapPin, Users, Calendar, TrendingUp } from "lucide-react";
 import { format, startOfMonth, endOfMonth, differenceInDays, parse } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -218,15 +219,15 @@ const AnaliseClientes = () => {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
       <DashboardNav />
       
-      <main className="flex-1 lg:ml-64 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Análise de Clientes</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Ranking e distribuição geográfica dos clientes.</p>
-        </div>
+      <main className="flex-1 lg:ml-64 pt-16 md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
+        <PageHeader 
+          title="Análise de Clientes"
+          description="Ranking completo e distribuição geográfica dos clientes"
+          icon={<TrendingUp className="h-6 w-6 text-primary" />}
+        />
 
         {/* Filtro de Data */}
         <DateFilter onFilterChange={handleFilterChange} statusList={[]} gruposClientes={gruposClientes} hideStatusFilter={true} />
