@@ -2,12 +2,12 @@ import { DashboardNav } from "@/components/DashboardNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { RankingClientesTable } from "@/components/RankingClientesTable";
-import { MapaBrasil } from "@/components/MapaBrasil";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
 import { Loader2, MapPin, Users } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 const AnaliseClientes = () => {
   const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string[]; tipoCliente?: string; nomeGrupo?: string }>(() => {
@@ -201,10 +201,37 @@ const AnaliseClientes = () => {
           </Card>
         </div>
 
-        {/* Mapa e Gráfico */}
+        {/* Gráficos */}
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Mapa do Brasil */}
-          <MapaBrasil distribuicao={distribuicaoPorUF} />
+          {/* Distribuição por Estado */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Distribuição por Estado</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={distribuicaoPorUF} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="uf" width={40} />
+                  <Tooltip 
+                    formatter={(value: number) => [value, 'Clientes']}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '6px'
+                    }}
+                  />
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                    {distribuicaoPorUF.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
           {/* Ranking de Clientes com Paginação */}
           <RankingClientesTable clientes={rankingClientes} />
