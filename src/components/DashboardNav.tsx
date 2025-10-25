@@ -1,10 +1,11 @@
-import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Menu, Briefcase, LogOut } from "lucide-react";
+import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Briefcase, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import convergeLogo from "@/assets/converge-logo.png";
+import { MobileTopBar } from "@/components/MobileTopBar";
 
 const navItems = [
   { icon: BarChart3, label: "Pedido x Venda", href: "/" },
@@ -15,23 +16,25 @@ const navItems = [
   { icon: Settings, label: "Configurações", href: "/configuracoes" },
 ];
 
-export const DashboardNav = () => {
+export const DashboardNav = ({ pageTitle }: { pageTitle?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
 
+  const getPageTitle = () => {
+    if (pageTitle) return pageTitle;
+    const currentItem = navItems.find(item => item.href === location.pathname);
+    return currentItem?.label || "Dashboard";
+  };
+
   return (
     <>
-      {/* Mobile menu button - moved to top bar */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden fixed top-3 left-4 z-50 bg-background/80 backdrop-blur-sm border shadow-sm"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
+      {/* Mobile Top Bar */}
+      <MobileTopBar 
+        onMenuClick={() => setIsOpen(!isOpen)} 
+        title={getPageTitle()}
+      />
 
       {/* Sidebar */}
       <aside

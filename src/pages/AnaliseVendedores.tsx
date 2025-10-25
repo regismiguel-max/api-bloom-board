@@ -1,11 +1,12 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
-import { Loader2, Users, TrendingUp, DollarSign, Eye, Award } from "lucide-react";
+import { Users, TrendingUp, DollarSign, Eye, Award } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -194,9 +195,9 @@ const AnaliseVendedores = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-background">
-      <DashboardNav />
+      <DashboardNav pageTitle="Análise de Vendedores" />
       
-      <main className="flex-1 lg:ml-64 pt-16 md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
+      <main className="flex-1 lg:ml-64 pt-[120px] md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
         <PageHeader 
           title="Análise de Vendedores"
           description="Performance detalhada e ranking completo dos vendedores"
@@ -207,14 +208,7 @@ const AnaliseVendedores = () => {
         <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} vendedores={vendedoresList} hideStatusFilter={true} />
 
         {/* Loading indicator */}
-        {isLoading && (
-          <div className="fixed top-4 right-4 z-50">
-            <div className="flex items-center gap-2 bg-background border rounded-lg px-4 py-2 shadow-lg">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Carregando...</p>
-            </div>
-          </div>
-        )}
+        {isLoading && <LoadingIndicator />}
 
         {/* KPIs */}
         <div className="grid gap-6 md:grid-cols-3">

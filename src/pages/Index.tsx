@@ -1,9 +1,10 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { KPICard } from "@/components/KPICard";
 import { DataTable } from "@/components/DataTable";
 import { DateFilter } from "@/components/DateFilter";
-import { DollarSign, Users, ShoppingCart, TrendingUp, Loader2, BarChart3 } from "lucide-react";
+import { DollarSign, Users, ShoppingCart, TrendingUp, BarChart3 } from "lucide-react";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useVendasStatus } from "@/hooks/useVendasStatus";
@@ -196,9 +197,9 @@ const Index = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-background">
-      <DashboardNav />
+      <DashboardNav pageTitle="Pedido X Venda" />
       
-      <main className="flex-1 lg:ml-64 pt-16 md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
+      <main className="flex-1 lg:ml-64 pt-[120px] md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
         <PageHeader 
           title="Pedido X Venda"
           description="Análise completa de pedidos e vendas em tempo real"
@@ -209,14 +210,7 @@ const Index = () => {
         <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} />
 
         {/* Loading indicator */}
-        {(isLoading || isFiltering) && (
-          <div className="fixed top-4 right-4 z-50">
-            <div className="flex items-center gap-2 bg-background border rounded-lg px-4 py-2 shadow-lg">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Carregando...</p>
-            </div>
-          </div>
-        )}
+        {(isLoading || isFiltering) && <LoadingIndicator />}
 
         {/* KPI Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

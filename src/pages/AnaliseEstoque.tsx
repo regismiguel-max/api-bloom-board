@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Package, AlertTriangle, TrendingUp, ChevronLeft, ChevronRight, Search, Box } from "lucide-react";
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 import {
   Table,
   TableBody,
@@ -87,8 +88,8 @@ const AnaliseEstoque = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-background">
-        <DashboardNav />
-        <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 pt-16 md:pt-0 w-full overflow-x-hidden">
+        <DashboardNav pageTitle="Análise de Estoque" />
+        <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 pt-[120px] md:pt-0 w-full overflow-x-hidden">
           <PageHeader 
             title="Análise de Estoque"
             description="Controle completo do estoque de produtos"
@@ -96,8 +97,7 @@ const AnaliseEstoque = () => {
           />
           
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4" />
-            <p className="text-lg text-muted-foreground">Carregando dados do estoque...</p>
+            <LoadingIndicator message="Carregando estoque..." />
           </div>
         </div>
       </div>
@@ -106,8 +106,8 @@ const AnaliseEstoque = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <DashboardNav />
-      <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 pt-16 md:pt-0 w-full overflow-x-hidden">
+      <DashboardNav pageTitle="Análise de Estoque" />
+      <div className="flex-1 p-4 sm:p-6 md:p-8 ml-0 lg:ml-64 pt-[120px] md:pt-0 w-full overflow-x-hidden">
         <PageHeader 
           title="Análise de Estoque"
           description="Controle completo do estoque de produtos"
