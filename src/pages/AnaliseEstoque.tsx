@@ -80,51 +80,6 @@ const AnaliseEstoque = () => {
       <div className="flex-1 p-8 ml-0 lg:ml-64">
         <h1 className="text-3xl font-bold mb-8 text-foreground">Análise de Estoque</h1>
 
-        {/* Filtros de Pesquisa */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Filtrar por Intervalo de Estoque
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4 items-end">
-              <div className="flex-1 min-w-[200px]">
-                <Label htmlFor="estoque-min">Estoque Mínimo</Label>
-                <Input
-                  id="estoque-min"
-                  type="number"
-                  min="0"
-                  placeholder="Ex: 0"
-                  value={estoqueMin}
-                  onChange={(e) => setEstoqueMin(e.target.value)}
-                />
-              </div>
-              <div className="flex-1 min-w-[200px]">
-                <Label htmlFor="estoque-max">Estoque Máximo</Label>
-                <Input
-                  id="estoque-max"
-                  type="number"
-                  min="0"
-                  placeholder="Ex: 100"
-                  value={estoqueMax}
-                  onChange={(e) => setEstoqueMax(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleApplyFilter}>
-                  <Search className="h-4 w-4 mr-2" />
-                  Aplicar
-                </Button>
-                <Button variant="outline" onClick={handleClearFilter}>
-                  Limpar
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
@@ -179,6 +134,43 @@ const AnaliseEstoque = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Filtros de Pesquisa */}
+            <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+              <div className="flex flex-wrap gap-4 items-end">
+                <div className="flex-1 min-w-[200px]">
+                  <Label htmlFor="estoque-min">Estoque Mínimo</Label>
+                  <Input
+                    id="estoque-min"
+                    type="number"
+                    min="0"
+                    placeholder="Ex: 0"
+                    value={estoqueMin}
+                    onChange={(e) => setEstoqueMin(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1 min-w-[200px]">
+                  <Label htmlFor="estoque-max">Estoque Máximo</Label>
+                  <Input
+                    id="estoque-max"
+                    type="number"
+                    min="0"
+                    placeholder="Ex: 100"
+                    value={estoqueMax}
+                    onChange={(e) => setEstoqueMax(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleApplyFilter}>
+                    <Search className="h-4 w-4 mr-2" />
+                    Filtrar
+                  </Button>
+                  <Button variant="outline" onClick={handleClearFilter}>
+                    Limpar
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <Table>
               <TableHeader>
                 <TableRow>
