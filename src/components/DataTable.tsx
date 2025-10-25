@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -122,95 +123,101 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
           />
         </div>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Pedido</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Valor</TableHead>
-              <TableHead>Total de Itens</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-center">Detalhes</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedOrders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.customer}</TableCell>
-                <TableCell>
-                  {new Intl.NumberFormat('pt-BR', { 
-                    style: 'currency', 
-                    currency: 'BRL' 
-                  }).format(order.amount)}
-                </TableCell>
-                <TableCell className="text-center">{order.totalItems}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={getStatusColor(order.status)}>
-                    {order.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-center">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Detalhes do Pedido {order.id}</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 mt-4">
-                        <div className="grid grid-cols-3 gap-4 pb-4 border-b">
-                          <div>
-                            <p className="text-sm text-muted-foreground">Cliente</p>
-                            <p className="font-medium">{order.customer}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Vendedor</p>
-                            <p className="font-medium">{order.vendedor}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">Total</p>
-                            <p className="font-medium">
-                              {new Intl.NumberFormat('pt-BR', { 
-                                style: 'currency', 
-                                currency: 'BRL' 
-                              }).format(order.amount)}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold mb-3">Produtos ({order.items.length})</h4>
-                          <div className="space-y-3">
-                            {order.items.map((item, idx) => (
-                              <div key={idx} className="p-3 rounded-lg border bg-card">
-                                <div className="grid gap-2">
-                                  <div>
-                                    <span className="text-sm text-muted-foreground">Produto: </span>
-                                    <span className="font-medium">{item.produto}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-sm text-muted-foreground">Marca: </span>
-                                    <span>{item.marca}</span>
-                                  </div>
-                                </div>
+      <CardContent className="p-0">
+        <ScrollArea className="relative">
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/80 to-transparent pointer-events-none z-10 md:hidden" />
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Pedido</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Total de Itens</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-center">Detalhes</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedOrders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">{order.id}</TableCell>
+                    <TableCell>{order.customer}</TableCell>
+                    <TableCell>
+                      {new Intl.NumberFormat('pt-BR', { 
+                        style: 'currency', 
+                        currency: 'BRL' 
+                      }).format(order.amount)}
+                    </TableCell>
+                    <TableCell className="text-center">{order.totalItems}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={getStatusColor(order.status)}>
+                        {order.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>Detalhes do Pedido {order.id}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4 mt-4">
+                            <div className="grid grid-cols-3 gap-4 pb-4 border-b">
+                              <div>
+                                <p className="text-sm text-muted-foreground">Cliente</p>
+                                <p className="font-medium">{order.customer}</p>
                               </div>
-                            ))}
+                              <div>
+                                <p className="text-sm text-muted-foreground">Vendedor</p>
+                                <p className="font-medium">{order.vendedor}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-muted-foreground">Total</p>
+                                <p className="font-medium">
+                                  {new Intl.NumberFormat('pt-BR', { 
+                                    style: 'currency', 
+                                    currency: 'BRL' 
+                                  }).format(order.amount)}
+                                </p>
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold mb-3">Produtos ({order.items.length})</h4>
+                              <div className="space-y-3">
+                                {order.items.map((item, idx) => (
+                                  <div key={idx} className="p-3 rounded-lg border bg-card">
+                                    <div className="grid gap-2">
+                                      <div>
+                                        <span className="text-sm text-muted-foreground">Produto: </span>
+                                        <span className="font-medium">{item.produto}</span>
+                                      </div>
+                                      <div>
+                                        <span className="text-sm text-muted-foreground">Marca: </span>
+                                        <span>{item.marca}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </ScrollArea>
         
-        {totalPages > 1 && (
+        <div className="px-6 pb-4">
+          {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-muted-foreground">
               Mostrando {filteredOrders.length} pedidos
@@ -242,9 +249,9 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
               </Button>
             </div>
           </div>
-        )}
-        
-        {totalPages <= 1 && (
+          )}
+          
+          {totalPages <= 1 && (
           <div className="mt-4">
             <p className="text-sm text-muted-foreground">
               Total: {filteredOrders.length} pedidos
@@ -256,7 +263,8 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
               )}
             </p>
           </div>
-        )}
+          )}
+        </div>
       </CardContent>
     </Card>
   );
