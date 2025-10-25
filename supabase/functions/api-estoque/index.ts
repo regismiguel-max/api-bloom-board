@@ -53,15 +53,43 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json();
-    
-    console.log('API Response - Total:', data.total, 'Items:', Array.isArray(data) ? data.length : (data.estoque?.length || 0));
+
+    console.log('API Response - has total?', typeof data?.total !== 'undefined');
+
+    // Determine total count
+    let totalCount: number | undefined = typeof data?.total !== 'undefined' ? Number(data.total) : undefined;
+
+    if (typeof totalCount === 'undefined') {
+      try {
+        // Fallback: fetch only for count using limite=0 with same filters
+        let countUrl = `http://24.152.15.254:8000/estoque`;
+        const countParams = new URLSearchParams();
+        countParams.append('limite', '0');
+        if (codigoProduto) countParams.append('codigo_produto', codigoProduto);
+        if (nomeProduto) countParams.append('nome_produto', nomeProduto);
+        countUrl += `?${countParams.toString()}`;
+        console.log('Fetching estoque total count from:', countUrl);
+        const countRes = await fetch(countUrl, { method: 'GET', headers });
+        if (countRes.ok) {
+          const countData = await countRes.json();
+          const count = Array.isArray(countData) ? countData.length : (countData.estoque?.length || 0);
+          totalCount = count;
+        } else {
+          console.warn('Count request failed with status', countRes.status);
+        }
+      } catch (e) {
+        console.warn('Count request error:', e instanceof Error ? e.message : e);
+      }
+    }
+
+    const items = Array.isArray(data) ? data : (data.estoque || []);
 
     const formattedResponse = {
-      estoque: Array.isArray(data) ? data : (data.estoque || []),
-      total: data.total || (Array.isArray(data) ? data.length : 0),
+      estoque: items,
+      total: typeof totalCount === 'number' ? totalCount : (Array.isArray(data) ? data.length : items.length),
       page: parseInt(page),
       limit: limite ? 0 : parseInt(limit),
-      hasMore: data.hasMore || false,
+      hasMore: typeof totalCount === 'number' ? (parseInt(page) * parseInt(limit)) < totalCount : (data.hasMore || false),
     };
 
     return new Response(JSON.stringify(formattedResponse), {
