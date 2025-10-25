@@ -65,11 +65,12 @@ const AnaliseEstoque = () => {
         <DashboardNav />
         <div className="flex-1 p-8 ml-0 lg:ml-64">
           <Skeleton className="h-12 w-64 mb-8" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {[1, 2, 3, 4].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-32" />
             ))}
           </div>
+          <Skeleton className="h-96 w-full" />
         </div>
       </div>
     );
@@ -161,11 +162,11 @@ const AnaliseEstoque = () => {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={handleApplyFilter}>
+                  <Button onClick={handleApplyFilter} disabled={isLoading}>
                     <Search className="h-4 w-4 mr-2" />
-                    Filtrar
+                    {isLoading ? "Carregando..." : "Filtrar"}
                   </Button>
-                  <Button variant="outline" onClick={handleClearFilter}>
+                  <Button variant="outline" onClick={handleClearFilter} disabled={isLoading}>
                     Limpar
                   </Button>
                 </div>
@@ -181,7 +182,16 @@ const AnaliseEstoque = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {estoque.length > 0 ? (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-8">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                        <span className="text-muted-foreground">Carregando produtos...</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : estoque.length > 0 ? (
                   estoque.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-mono text-sm">
