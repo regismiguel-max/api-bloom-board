@@ -9,7 +9,7 @@ interface MobileTopBarProps {
 
 export const MobileTopBar = ({ onMenuClick, title }: MobileTopBarProps) => {
   return (
-    <div className="md:hidden fixed top-0 left-0 right-0 z-[100] bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg safe-top">
+    <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg safe-top">
       <style>{`
         .safe-top {
           padding-top: env(safe-area-inset-top);
