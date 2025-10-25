@@ -16,7 +16,7 @@ interface RankingClientesTableProps {
   clientes: Cliente[];
 }
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 10;
 
 export const RankingClientesTable = ({ clientes }: RankingClientesTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);

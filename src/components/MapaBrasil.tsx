@@ -38,35 +38,35 @@ export const MapaBrasil = ({ distribuicao }: MapaBrasilProps) => {
     count: ufMap.get(hoveredState) || 0
   } : null;
 
-  // Coordenadas simplificadas dos estados brasileiros para o SVG
+  // Coordenadas mais realistas dos estados brasileiros para o SVG
   const estados = [
-    { uf: "AC", path: "M 50 250 L 80 250 L 80 280 L 50 280 Z", cx: 65, cy: 265 },
-    { uf: "AL", path: "M 420 320 L 440 320 L 440 340 L 420 340 Z", cx: 430, cy: 330 },
-    { uf: "AP", path: "M 280 50 L 310 50 L 310 80 L 280 80 Z", cx: 295, cy: 65 },
-    { uf: "AM", path: "M 80 150 L 180 150 L 180 280 L 80 280 Z", cx: 130, cy: 215 },
-    { uf: "BA", path: "M 350 270 L 430 270 L 430 370 L 350 370 Z", cx: 390, cy: 320 },
-    { uf: "CE", path: "M 380 200 L 420 200 L 420 240 L 380 240 Z", cx: 400, cy: 220 },
-    { uf: "DF", path: "M 340 330 L 350 330 L 350 340 L 340 340 Z", cx: 345, cy: 335 },
-    { uf: "ES", path: "M 380 390 L 400 390 L 400 410 L 380 410 Z", cx: 390, cy: 400 },
-    { uf: "GO", path: "M 310 320 L 360 320 L 360 380 L 310 380 Z", cx: 335, cy: 350 },
-    { uf: "MA", path: "M 320 180 L 380 180 L 380 250 L 320 250 Z", cx: 350, cy: 215 },
-    { uf: "MT", path: "M 230 250 L 310 250 L 310 350 L 230 350 Z", cx: 270, cy: 300 },
-    { uf: "MS", path: "M 240 360 L 310 360 L 310 430 L 240 430 Z", cx: 275, cy: 395 },
-    { uf: "MG", path: "M 330 360 L 390 360 L 390 420 L 330 420 Z", cx: 360, cy: 390 },
-    { uf: "PA", path: "M 200 120 L 320 120 L 320 230 L 200 230 Z", cx: 260, cy: 175 },
-    { uf: "PB", path: "M 420 240 L 445 240 L 445 260 L 420 260 Z", cx: 432, cy: 250 },
-    { uf: "PR", path: "M 280 430 L 340 430 L 340 470 L 280 470 Z", cx: 310, cy: 450 },
-    { uf: "PE", path: "M 380 250 L 420 250 L 420 290 L 380 290 Z", cx: 400, cy: 270 },
-    { uf: "PI", path: "M 340 210 L 380 210 L 380 270 L 340 270 Z", cx: 360, cy: 240 },
-    { uf: "RJ", path: "M 390 410 L 420 410 L 420 440 L 390 440 Z", cx: 405, cy: 425 },
-    { uf: "RN", path: "M 410 220 L 440 220 L 440 240 L 410 240 Z", cx: 425, cy: 230 },
-    { uf: "RS", path: "M 260 480 L 320 480 L 320 530 L 260 530 Z", cx: 290, cy: 505 },
-    { uf: "RO", path: "M 150 280 L 200 280 L 200 340 L 150 340 Z", cx: 175, cy: 310 },
-    { uf: "RR", path: "M 150 30 L 200 30 L 200 120 L 150 120 Z", cx: 175, cy: 75 },
-    { uf: "SC", path: "M 290 470 L 350 470 L 350 500 L 290 500 Z", cx: 320, cy: 485 },
-    { uf: "SP", path: "M 320 420 L 380 420 L 380 470 L 320 470 Z", cx: 350, cy: 445 },
-    { uf: "SE", path: "M 410 290 L 430 290 L 430 310 L 410 310 Z", cx: 420, cy: 300 },
-    { uf: "TO", path: "M 300 250 L 340 250 L 340 320 L 300 320 Z", cx: 320, cy: 285 },
+    { uf: "AC", path: "M 70 290 L 90 290 L 90 315 L 70 315 Z", cx: 80, cy: 302 },
+    { uf: "AL", path: "M 405 315 L 420 315 L 420 332 L 405 332 Z", cx: 412, cy: 323 },
+    { uf: "AP", path: "M 270 95 L 295 95 L 295 125 L 270 125 Z", cx: 282, cy: 110 },
+    { uf: "AM", path: "M 95 200 L 180 200 L 180 310 L 95 310 Z", cx: 137, cy: 255 },
+    { uf: "BA", path: "M 345 310 L 410 310 L 410 375 L 345 375 Z", cx: 377, cy: 342 },
+    { uf: "CE", path: "M 350 230 L 390 230 L 390 260 L 350 260 Z", cx: 370, cy: 245 },
+    { uf: "DF", path: "M 330 355 L 340 355 L 340 365 L 330 365 Z", cx: 335, cy: 360 },
+    { uf: "ES", path: "M 375 410 L 395 410 L 395 425 L 375 425 Z", cx: 385, cy: 417 },
+    { uf: "GO", path: "M 310 340 L 355 340 L 355 390 L 310 390 Z", cx: 332, cy: 365 },
+    { uf: "MA", path: "M 310 200 L 355 200 L 355 260 L 310 260 Z", cx: 332, cy: 230 },
+    { uf: "MT", path: "M 235 270 L 310 270 L 310 355 L 235 355 Z", cx: 272, cy: 312 },
+    { uf: "MS", path: "M 245 370 L 310 370 L 310 425 L 245 425 Z", cx: 277, cy: 397 },
+    { uf: "MG", path: "M 320 380 L 380 380 L 380 430 L 320 430 Z", cx: 350, cy: 405 },
+    { uf: "PA", path: "M 200 170 L 310 170 L 310 265 L 200 265 Z", cx: 255, cy: 217 },
+    { uf: "PB", path: "M 395 260 L 415 260 L 415 275 L 395 275 Z", cx: 405, cy: 267 },
+    { uf: "PR", path: "M 285 430 L 335 430 L 335 460 L 285 460 Z", cx: 310, cy: 445 },
+    { uf: "PE", path: "M 365 275 L 405 275 L 405 310 L 365 310 Z", cx: 385, cy: 292 },
+    { uf: "PI", path: "M 330 240 L 365 240 L 365 295 L 330 295 Z", cx: 347, cy: 267 },
+    { uf: "RJ", path: "M 365 430 L 390 430 L 390 450 L 365 450 Z", cx: 377, cy: 440 },
+    { uf: "RN", path: "M 390 240 L 415 240 L 415 258 L 390 258 Z", cx: 402, cy: 249 },
+    { uf: "RS", path: "M 270 475 L 315 475 L 315 520 L 270 520 Z", cx: 292, cy: 497 },
+    { uf: "RO", path: "M 165 315 L 205 315 L 205 355 L 165 355 Z", cx: 185, cy: 335 },
+    { uf: "RR", path: "M 160 90 L 205 90 L 205 165 L 160 165 Z", cx: 182, cy: 127 },
+    { uf: "SC", path: "M 300 460 L 350 460 L 350 490 L 300 490 Z", cx: 325, cy: 475 },
+    { uf: "SP", path: "M 320 420 L 370 420 L 370 460 L 320 460 Z", cx: 345, cy: 440 },
+    { uf: "SE", path: "M 400 305 L 418 305 L 418 320 L 400 320 Z", cx: 409, cy: 312 },
+    { uf: "TO", path: "M 305 280 L 335 280 L 335 340 L 305 340 Z", cx: 320, cy: 310 },
   ];
 
   return (
@@ -76,7 +76,7 @@ export const MapaBrasil = ({ distribuicao }: MapaBrasilProps) => {
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <svg viewBox="0 0 500 560" className="w-full h-auto">
+          <svg viewBox="0 0 480 560" className="w-full h-auto max-w-md mx-auto">
             {/* Estados */}
             {estados.map((estado) => (
               <g key={estado.uf}>
