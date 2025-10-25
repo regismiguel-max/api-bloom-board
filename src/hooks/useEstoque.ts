@@ -26,8 +26,14 @@ interface EstoqueFilters {
 const fetchEstoque = async (filters?: EstoqueFilters) => {
   const queryParams = new URLSearchParams();
   
-  if (filters?.page) queryParams.append("page", filters.page.toString());
-  if (filters?.limit) queryParams.append("limit", filters.limit.toString());
+  // Se limit for 0, usar limite=0 para buscar todos
+  if (filters?.limit === 0) {
+    queryParams.append("limite", "0");
+  } else {
+    if (filters?.page) queryParams.append("page", filters.page.toString());
+    if (filters?.limit) queryParams.append("limit", filters.limit.toString());
+  }
+  
   if (filters?.codigoProduto) queryParams.append("codigo_produto", filters.codigoProduto);
   if (filters?.nomeProduto) queryParams.append("nome_produto", filters.nomeProduto);
 

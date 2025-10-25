@@ -20,13 +20,19 @@ const AnaliseEstoque = () => {
   const itemsPerPage = 20;
   
   const { data, isLoading } = useEstoque({ page: currentPage, limit: itemsPerPage });
+  const { data: allData } = useEstoque({ page: 1, limit: 0 }); // Busca todos para KPIs
 
   const estoque = data?.estoque || [];
   const totalItens = data?.total || 0;
   const totalPages = Math.ceil(totalItens / itemsPerPage);
   
-  const produtosSemEstoque = estoque.filter(item => (item.ESTOQUE_ATUAL || 0) === 0).length;
-  const produtosEstoque10 = estoque.filter(item => (item.ESTOQUE_ATUAL || 0) === 10).length;
+  // KPIs calculados com TODOS os dados da base
+  const allEstoque = allData?.estoque || [];
+  const produtosSemEstoque = allEstoque.filter(item => (item.ESTOQUE_ATUAL || 0) === 0).length;
+  const produtosEstoque10ouMenos = allEstoque.filter(item => {
+    const qtd = item.ESTOQUE_ATUAL || 0;
+    return qtd > 0 && qtd <= 10;
+  }).length;
 
   if (isLoading) {
     return (
@@ -72,20 +78,20 @@ const AnaliseEstoque = () => {
               <div className="text-2xl font-bold text-destructive">
                 {produtosSemEstoque}
               </div>
-              <p className="text-xs text-muted-foreground">produtos nesta página</p>
+              <p className="text-xs text-muted-foreground">em toda a base</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Estoque Igual a 10</CardTitle>
+              <CardTitle className="text-sm font-medium">Estoque ≤ 10</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {produtosEstoque10}
+                {produtosEstoque10ouMenos}
               </div>
-              <p className="text-xs text-muted-foreground">produtos nesta página</p>
+              <p className="text-xs text-muted-foreground">em toda a base</p>
             </CardContent>
           </Card>
         </div>
