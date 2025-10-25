@@ -206,6 +206,9 @@ const Index = () => {
           icon={<BarChart3 className="h-6 w-6 text-primary" />}
         />
 
+        {/* Filtro de Data - Movido para o topo */}
+        <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} />
+
         {/* KPI Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <KPICard
@@ -231,9 +234,6 @@ const Index = () => {
             icon={TrendingUp}
           />
         </div>
-
-        {/* Filtro de Data */}
-        <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} />
 
         {/* Loading indicator */}
         {(isLoading || isFiltering) && <LoadingIndicator />}
