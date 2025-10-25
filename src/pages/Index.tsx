@@ -238,30 +238,6 @@ const Index = () => {
         {/* Loading indicator */}
         {(isLoading || isFiltering) && <LoadingIndicator />}
 
-          <KPICard
-            title="Receita do Período"
-            value={`R$ ${(totalRevenue || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            change={revenueChange}
-            trend={revenueChange >= 0 ? "up" : "down"}
-            icon={DollarSign}
-          />
-          <KPICard
-            title="Clientes Únicos"
-            value={(totalClientes || 0).toLocaleString("pt-BR")}
-            icon={Users}
-          />
-          <KPICard
-            title="Vendas do Período"
-            value={(totalOrders || 0).toLocaleString("pt-BR")}
-            icon={ShoppingCart}
-          />
-          <KPICard
-            title="Ticket Médio"
-            value={`R$ ${totalOrders > 0 ? (totalRevenue / totalOrders).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0,00"}`}
-            icon={TrendingUp}
-          />
-        </div>
-
         {/* Data Table */}
         <DataTable orders={recentOrders} isLoading={isLoading} totalUnfiltered={totalOrdersUnfiltered} />
       </main>
