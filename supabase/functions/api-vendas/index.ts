@@ -84,6 +84,12 @@ Deno.serve(async (req) => {
     const vendasArray = data.vendas || data.data || (Array.isArray(data) ? data : []);
     const total = data.total || vendasArray.length;
     
+    // Log do primeiro item para verificar campos STATUS
+    if (vendasArray.length > 0) {
+      console.log('First item sample:', JSON.stringify(vendasArray[0]));
+      console.log('STATUS_PEDIDO exists?', 'STATUS_PEDIDO' in vendasArray[0]);
+    }
+    
     console.log(`Successfully fetched ${vendasArray.length} vendas (Total: ${total})`);
 
     // Retornar com metadados

@@ -75,18 +75,15 @@ export const useVendas = (filters?: VendasFilters) => {
     queryFn: async () => {
       try {
         const vendas = await fetchAllVendas(filters);
+        console.log(`✅ API retornou ${vendas.length} vendas`);
         
-        // Se a API retornar array vazio, usar dados mock para demonstração
-        if (vendas.length === 0) {
-          console.log('API returned empty array, using mock data');
-          return mockVendas;
-        }
-        
+        // Retornar os dados da API diretamente, mesmo se vazio
+        // Não usar mock data para evitar mistura de formatos de status
         return vendas;
       } catch (error) {
-        console.error('Error fetching vendas:', error);
-        console.log('Using mock data as fallback');
-        return mockVendas;
+        console.error('❌ Error fetching vendas:', error);
+        // Em caso de erro, retornar array vazio ao invés de mock
+        return [];
       }
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
