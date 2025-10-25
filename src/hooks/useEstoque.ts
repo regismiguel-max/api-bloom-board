@@ -3,9 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface ItemEstoque {
   id?: string | number;
-  CODIGO_PRODUTO?: string;
+  CODIGO_PRO?: string;
   NOME_PRODUTO?: string;
-  QUANTIDADE?: number;
+  ESTOQUE_ATUAL?: number;
   ESTOQUE_MINIMO?: number;
   ESTOQUE_MAXIMO?: number;
   VALOR_UNITARIO?: number;

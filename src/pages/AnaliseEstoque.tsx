@@ -25,10 +25,7 @@ const AnaliseEstoque = () => {
   const totalItens = data?.total || 0;
   const totalPages = Math.ceil(totalItens / itemsPerPage);
   
-  const quantidadeTotal = estoque.reduce((acc, item) => acc + (item.QUANTIDADE || 0), 0);
-  const itensAbaixoMinimo = estoque.filter(item => 
-    item.ESTOQUE_MINIMO && item.QUANTIDADE < item.ESTOQUE_MINIMO
-  ).length;
+  const quantidadeTotal = estoque.reduce((acc, item) => acc + (item.ESTOQUE_ATUAL || 0), 0);
 
   if (isLoading) {
     return (
@@ -53,7 +50,7 @@ const AnaliseEstoque = () => {
         <h1 className="text-3xl font-bold mb-8 text-foreground">Análise de Estoque</h1>
 
         {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Itens</CardTitle>
@@ -75,19 +72,6 @@ const AnaliseEstoque = () => {
                 {quantidadeTotal.toLocaleString('pt-BR')}
               </div>
               <p className="text-xs text-muted-foreground">unidades nesta página</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Baixo Estoque</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-destructive" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-destructive">
-                {itensAbaixoMinimo}
-              </div>
-              <p className="text-xs text-muted-foreground">itens nesta página</p>
             </CardContent>
           </Card>
         </div>
@@ -112,45 +96,26 @@ const AnaliseEstoque = () => {
                   <TableHead>Código</TableHead>
                   <TableHead>Produto</TableHead>
                   <TableHead className="text-right">Quantidade</TableHead>
-                  <TableHead className="text-right">Mínimo</TableHead>
-                  <TableHead className="text-right">Máximo</TableHead>
-                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {estoque.length > 0 ? (
-                  estoque.map((item, index) => {
-                    const isLow = item.ESTOQUE_MINIMO && item.QUANTIDADE < item.ESTOQUE_MINIMO;
-                    return (
-                      <TableRow key={index}>
-                        <TableCell className="font-mono text-sm">
-                          {item.CODIGO_PRODUTO}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {item.NOME_PRODUTO}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {item.QUANTIDADE?.toLocaleString('pt-BR')}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {item.ESTOQUE_MINIMO || '-'}
-                        </TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {item.ESTOQUE_MAXIMO || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {isLow ? (
-                            <Badge variant="destructive">Baixo</Badge>
-                          ) : (
-                            <Badge variant="secondary">OK</Badge>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
+                  estoque.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-mono text-sm">
+                        {item.CODIGO_PRO}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {item.NOME_PRODUTO}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {item.ESTOQUE_ATUAL?.toLocaleString('pt-BR') || 0}
+                      </TableCell>
+                    </TableRow>
+                  ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
                       Nenhum item encontrado
                     </TableCell>
                   </TableRow>
