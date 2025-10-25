@@ -294,58 +294,109 @@ export const DateFilter = ({
 
   return (
     <>
-      {/* Mobile ultracompacto (sem Card) */}
-      <div className="md:hidden px-0">
-        <div className="flex items-center gap-2 px-1">
+      {/* Mobile: período fixo + ícone filtro */}
+      <div className="md:hidden">
+        <div className="flex items-center justify-between px-1 py-2">
+          <div className="flex items-center gap-2">
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">
+              {date?.from && date?.to
+                ? `${format(date.from, "dd/MM", { locale: ptBR })} - ${format(date.to, "dd/MM", { locale: ptBR })}`
+                : "Mês Atual"}
+            </span>
+          </div>
+
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="flex-1 h-9">
-                <Filter className="h-4 w-4 mr-2" />
-                Filtros
+              <Button variant="outline" size="icon" className="h-10 w-10 relative">
+                <Filter className="h-5 w-5" />
                 {activeFiltersCount > 0 && (
-                  <Badge variant="secondary" className="ml-2 h-5 min-w-5 px-1.5">
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
                     {activeFiltersCount}
                   </Badge>
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[80vh]">
+            <SheetContent side="bottom" className="h-[85vh]">
               <SheetHeader>
-                <SheetTitle>Filtros Avançados</SheetTitle>
+                <SheetTitle>Filtros</SheetTitle>
               </SheetHeader>
-              <div className="mt-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+              <div className="mt-6 overflow-y-auto max-h-[calc(85vh-120px)] space-y-6">
+                {/* Período */}
+                <div className="space-y-3">
+                  <span className="text-sm font-medium">Período:</span>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        handlePresetClick("mes-atual");
+                        setIsOpen(false);
+                      }}
+                    >
+                      Mês Atual
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        handlePresetClick("ultimos-30");
+                        setIsOpen(false);
+                      }}
+                    >
+                      30 dias
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        handlePresetClick("ultimos-90");
+                        setIsOpen(false);
+                      }}
+                    >
+                      90 dias
+                    </Button>
+                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="default" className="w-full justify-start">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date?.from && date?.to
+                          ? `${format(date.from, "dd/MM/yyyy", { locale: ptBR })} - ${format(
+                              date.to,
+                              "dd/MM/yyyy",
+                              { locale: ptBR }
+                            )}`
+                          : "Selecione período"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="center">
+                      <Calendar
+                        mode="range"
+                        selected={date}
+                        onSelect={handleDateSelect}
+                        numberOfMonths={1}
+                        locale={ptBR}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                        disabled={(date) => date > new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Outros filtros */}
                 <FilterContent />
               </div>
             </SheetContent>
           </Sheet>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="default" size="sm" className="h-9 px-3">
-                <CalendarIcon className="h-4 w-4 mr-1" />
-                <span className="text-xs truncate">
-                  {date?.from && format(date.from, "dd/MM", { locale: ptBR })}
-                  {date?.to && ` - ${format(date.to, "dd/MM", { locale: ptBR })}`}
-                </span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="range"
-                selected={date}
-                onSelect={handleDateSelect}
-                numberOfMonths={1}
-                locale={ptBR}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-                disabled={(date) => date > new Date()}
-              />
-            </PopoverContent>
-          </Popover>
         </div>
       </div>
 
-      {/* Desktop completo */}
+      {/* Desktop: Layout completo */}
       <Card className="hidden md:block">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4">
