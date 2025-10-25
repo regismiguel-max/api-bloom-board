@@ -7,7 +7,7 @@ import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
 import { Loader2, MapPin, Users } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const AnaliseClientes = () => {
   const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string[]; tipoCliente?: string; nomeGrupo?: string }>(() => {
@@ -210,10 +210,17 @@ const AnaliseClientes = () => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={distribuicaoPorUF} layout="vertical" margin={{ left: 20, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis type="category" dataKey="uf" width={40} />
+                <BarChart data={distribuicaoPorUF}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="uf" 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
                   <Tooltip 
                     formatter={(value: number) => [value, 'Clientes']}
                     labelStyle={{ color: 'hsl(var(--foreground))' }}
@@ -223,11 +230,11 @@ const AnaliseClientes = () => {
                       borderRadius: '6px'
                     }}
                   />
-                  <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                    {distribuicaoPorUF.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Bar>
+                  <Bar 
+                    dataKey="count" 
+                    fill="hsl(var(--primary))"
+                    radius={[8, 8, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
