@@ -4,6 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import convergeLogo from "@/assets/converge-logo.png";
 
 const navItems = [
   { icon: BarChart3, label: "Pedido x Venda", href: "/" },
@@ -42,8 +43,11 @@ export const DashboardNav = () => {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center border-b border-sidebar-border px-6">
-            <BarChart3 className="h-6 w-6 text-sidebar-primary" />
-            <span className="ml-2 text-lg font-bold text-sidebar-foreground">Analytics BI</span>
+            <img src={convergeLogo} alt="Converge Logo" className="h-10 w-auto object-contain" />
+            <div className="ml-3 flex flex-col">
+              <span className="text-lg font-bold text-sidebar-foreground leading-tight">CONVERGE</span>
+              <span className="text-[10px] text-sidebar-foreground/70 leading-tight">Soluções em Saúde</span>
+            </div>
           </div>
 
           {/* Navigation */}
