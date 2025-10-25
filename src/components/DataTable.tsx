@@ -32,10 +32,19 @@ interface DataTableProps {
 }
 
 const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE_MOBILE = 5;
 
 export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Detectar mudanças no tamanho da tela
+  useState(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  });
 
   const filteredOrders = useMemo(() => {
     if (!searchTerm.trim()) return orders;
@@ -48,13 +57,14 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
     );
   }, [orders, searchTerm]);
 
-  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const itemsPerPage = isMobile ? ITEMS_PER_PAGE_MOBILE : ITEMS_PER_PAGE;
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   
   const paginatedOrders = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
     return filteredOrders.slice(startIndex, endIndex);
-  }, [filteredOrders, currentPage]);
+  }, [filteredOrders, currentPage, itemsPerPage]);
 
   // Reset to page 1 when search changes or orders change
   useMemo(() => {
@@ -109,11 +119,9 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Pesquisa de pedidos</CardTitle>
-        </div>
-        <div className="relative mt-4">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-xl font-bold">Pesquisa de pedidos</CardTitle>
+        <div className="relative mt-3">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por pedido, cliente ou CNPJ..."
@@ -259,43 +267,46 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
             </Table>
           </div>
         
-        <div className="px-6 pb-4">
+        <div className="px-4 md:px-6 pb-4">
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-            <p className="text-sm text-muted-foreground">
-              Mostrando {filteredOrders.length} pedidos
-              {totalUnfiltered && totalUnfiltered !== orders.length && (
-                <> de {totalUnfiltered} total</>
-              )}
-              {orders.length !== filteredOrders.length && orders.length !== totalUnfiltered && (
-                <> | {orders.length} após filtros</>
-              )} • Página {currentPage} de {totalPages}
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Próxima
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
+              <p className="text-sm text-muted-foreground text-center md:text-left">
+                Mostrando {paginatedOrders.length} pedidos
+                {totalUnfiltered && totalUnfiltered !== orders.length && (
+                  <> de {totalUnfiltered} total</>
+                )}
+                {orders.length !== filteredOrders.length && orders.length !== totalUnfiltered && (
+                  <> | {orders.length} após filtros</>
+                )}
+                <span className="block md:inline md:ml-1">• Página {currentPage} de {totalPages}</span>
+              </p>
+              <div className="flex gap-2 justify-center md:justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="flex-1 md:flex-none"
+                >
+                  <ChevronLeft className="h-4 w-4 md:mr-1" />
+                  <span className="hidden md:inline">Anterior</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="flex-1 md:flex-none"
+                >
+                  <span className="hidden md:inline">Próxima</span>
+                  <ChevronRight className="h-4 w-4 md:ml-1" />
+                </Button>
             </div>
           </div>
           )}
           
           {totalPages <= 1 && (
-            <div className="mt-4">
+            <div className="mt-4 text-center md:text-left">
               <p className="text-sm text-muted-foreground">
                 Total: {filteredOrders.length} pedidos
                 {totalUnfiltered && totalUnfiltered !== orders.length && (
