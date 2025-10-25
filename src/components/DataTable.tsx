@@ -144,7 +144,7 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
                 <TableHead className="w-[200px]">Cliente</TableHead>
                 <TableHead className="w-[120px]">Valor</TableHead>
                 <TableHead className="w-[100px] text-center">Itens</TableHead>
-                <TableHead className="w-[130px]">Status</TableHead>
+                <TableHead className="w-[150px]">Status</TableHead>
                 <TableHead className="w-[100px] text-center sticky right-0 bg-background shadow-[-4px_0_8px_rgba(0,0,0,0.05)]">Detalhes</TableHead>
               </TableRow>
             </TableHeader>
@@ -164,8 +164,8 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
                     }).format(order.amount)}
                   </TableCell>
                   <TableCell className="text-center font-medium w-[100px]">{order.totalItems}</TableCell>
-                  <TableCell className="w-[130px]">
-                    <Badge variant="outline" className={getStatusColor(order.status)}>
+                  <TableCell className="w-[150px]">
+                    <Badge variant="outline" className={`${getStatusColor(order.status)} whitespace-nowrap`}>
                       {order.status}
                     </Badge>
                   </TableCell>
