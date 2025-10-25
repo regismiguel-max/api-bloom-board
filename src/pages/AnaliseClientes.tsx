@@ -60,7 +60,7 @@ const AnaliseClientes = () => {
     return Array.from(grupos).sort();
   }, [clientes]);
 
-  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string) => {
+  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string, vendedor?: string) => {
     setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente, nomeGrupo });
   };
 

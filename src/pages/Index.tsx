@@ -187,7 +187,7 @@ const Index = () => {
     return ((totalOrders / totalClientes) * 100).toFixed(2);
   }, [totalOrders, totalClientes]);
 
-  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string) => {
+  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string, vendedor?: string) => {
     console.log('Filter changed:', { dataInicio, dataFim, statusPedido, tipoCliente, nomeGrupo });
     setIsFiltering(true);
     setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente, nomeGrupo });

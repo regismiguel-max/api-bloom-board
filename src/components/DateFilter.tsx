@@ -12,13 +12,14 @@ import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
 interface DateFilterProps {
-  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string) => void;
+  onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string, vendedor?: string) => void;
   statusList?: string[];
   gruposClientes?: string[];
+  vendedores?: string[];
   hideStatusFilter?: boolean;
 }
 
-export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [], hideStatusFilter = false }: DateFilterProps) => {
+export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [], vendedores = [], hideStatusFilter = false }: DateFilterProps) => {
   const now = new Date();
   const [date, setDate] = useState<DateRange | undefined>({
     from: startOfMonth(now),
@@ -27,6 +28,7 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
   const [statusPedido, setStatusPedido] = useState<string[]>([]);
   const [tipoCliente, setTipoCliente] = useState<string>("todos");
   const [nomeGrupo, setNomeGrupo] = useState<string>("todos");
+  const [vendedor, setVendedor] = useState<string>("todos");
 
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
@@ -39,7 +41,8 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
         dataFim, 
         statusPedido.length > 0 ? statusPedido : undefined,
         tipoCliente !== "todos" ? tipoCliente : undefined,
-        nomeGrupo !== "todos" ? nomeGrupo : undefined
+        nomeGrupo !== "todos" ? nomeGrupo : undefined,
+        vendedor !== "todos" ? vendedor : undefined
       );
     }
   };
@@ -59,7 +62,8 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
         dataFim, 
         newStatus.length > 0 ? newStatus : undefined,
         tipoCliente !== "todos" ? tipoCliente : undefined,
-        nomeGrupo !== "todos" ? nomeGrupo : undefined
+        nomeGrupo !== "todos" ? nomeGrupo : undefined,
+        vendedor !== "todos" ? vendedor : undefined
       );
     }
   };
@@ -75,7 +79,8 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
         dataFim, 
         statusPedido.length > 0 ? statusPedido : undefined,
         newTipo !== "todos" ? newTipo : undefined,
-        nomeGrupo !== "todos" ? nomeGrupo : undefined
+        nomeGrupo !== "todos" ? nomeGrupo : undefined,
+        vendedor !== "todos" ? vendedor : undefined
       );
     }
   };
@@ -91,7 +96,25 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
         dataFim, 
         statusPedido.length > 0 ? statusPedido : undefined,
         tipoCliente !== "todos" ? tipoCliente : undefined,
-        newGrupo !== "todos" ? newGrupo : undefined
+        newGrupo !== "todos" ? newGrupo : undefined,
+        vendedor !== "todos" ? vendedor : undefined
+      );
+    }
+  };
+
+  const handleVendedorChange = (newVendedor: string) => {
+    setVendedor(newVendedor);
+    
+    if (date?.from && date?.to) {
+      const dataInicio = format(date.from, 'yyyy-MM-dd');
+      const dataFim = format(date.to, 'yyyy-MM-dd');
+      onFilterChange(
+        dataInicio, 
+        dataFim, 
+        statusPedido.length > 0 ? statusPedido : undefined,
+        tipoCliente !== "todos" ? tipoCliente : undefined,
+        nomeGrupo !== "todos" ? nomeGrupo : undefined,
+        newVendedor !== "todos" ? newVendedor : undefined
       );
     }
   };
@@ -124,7 +147,8 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
       dataFim, 
       statusPedido.length > 0 ? statusPedido : undefined,
       tipoCliente !== "todos" ? tipoCliente : undefined,
-      nomeGrupo !== "todos" ? nomeGrupo : undefined
+      nomeGrupo !== "todos" ? nomeGrupo : undefined,
+      vendedor !== "todos" ? vendedor : undefined
     );
   };
 
@@ -133,7 +157,7 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
           {/* Filtros em linha */}
-          <div className={cn("grid gap-4", hideStatusFilter ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 md:grid-cols-3")}>
+          <div className={cn("grid gap-4", hideStatusFilter ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-4")}>
             {/* Filtro de Status */}
             {!hideStatusFilter && (
               <div className="flex flex-col gap-2">
@@ -180,7 +204,7 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
                             if (date?.from && date?.to) {
                               const dataInicio = format(date.from, 'yyyy-MM-dd');
                               const dataFim = format(date.to, 'yyyy-MM-dd');
-                              onFilterChange(dataInicio, dataFim, undefined, tipoCliente !== "todos" ? tipoCliente : undefined);
+                              onFilterChange(dataInicio, dataFim, undefined, tipoCliente !== "todos" ? tipoCliente : undefined, nomeGrupo !== "todos" ? nomeGrupo : undefined, vendedor !== "todos" ? vendedor : undefined);
                             }
                           }}
                         >
@@ -225,6 +249,26 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Filtro de Vendedor */}
+            {vendedores.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium">Vendedor:</span>
+                <Select value={vendedor} onValueChange={handleVendedorChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o vendedor" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background z-50">
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {vendedores.map((vend) => (
+                      <SelectItem key={vend} value={vend}>
+                        {vend}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           {/* Filtro de Data */}

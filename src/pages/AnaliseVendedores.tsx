@@ -9,7 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const AnaliseVendedores = () => {
-  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string[]; tipoCliente?: string; nomeGrupo?: string }>(() => {
+  const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string[]; tipoCliente?: string; nomeGrupo?: string; vendedor?: string }>(() => {
     const now = new Date();
     const dataInicio = format(startOfMonth(now), 'yyyy-MM-dd');
     const dataFim = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -21,8 +21,19 @@ const AnaliseVendedores = () => {
   const statusList = [];
   const gruposClientes = [];
 
-  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string) => {
-    setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente, nomeGrupo });
+  // Lista de vendedores únicos
+  const vendedoresList = useMemo(() => {
+    const vendedoresSet = new Set<string>();
+    vendas.forEach((venda) => {
+      if (venda.VENDEDOR_NOME) {
+        vendedoresSet.add(venda.VENDEDOR_NOME);
+      }
+    });
+    return Array.from(vendedoresSet).sort();
+  }, [vendas]);
+
+  const handleFilterChange = (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string, vendedor?: string) => {
+    setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente, nomeGrupo, vendedor });
   };
 
   // Análise por vendedor
@@ -109,7 +120,7 @@ const AnaliseVendedores = () => {
         </div>
 
         {/* Filtro de Data */}
-        <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} hideStatusFilter={true} />
+        <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} vendedores={vendedoresList} hideStatusFilter={true} />
 
         {/* Loading overlay */}
         {isLoading && (
