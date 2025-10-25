@@ -15,9 +15,10 @@ interface DateFilterProps {
   onFilterChange: (dataInicio: string, dataFim: string, statusPedido?: string[], tipoCliente?: string, nomeGrupo?: string) => void;
   statusList?: string[];
   gruposClientes?: string[];
+  hideStatusFilter?: boolean;
 }
 
-export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [] }: DateFilterProps) => {
+export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [], hideStatusFilter = false }: DateFilterProps) => {
   const now = new Date();
   const [date, setDate] = useState<DateRange | undefined>({
     from: startOfMonth(now),
@@ -132,63 +133,65 @@ export const DateFilter = ({ onFilterChange, statusList = [], gruposClientes = [
       <CardContent className="p-4">
         <div className="flex flex-col gap-4">
           {/* Filtros em linha */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={cn("grid gap-4", hideStatusFilter ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 md:grid-cols-3")}>
             {/* Filtro de Status */}
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium">Status do Pedido:</span>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between"
-                  >
-                    {statusPedido.length === 0 
-                      ? "Todos os status" 
-                      : statusPedido.length === 1
-                      ? statusPedido[0]
-                      : `${statusPedido.length} selecionados`
-                    }
-                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-3 bg-background z-50" align="start">
-                  <div className="space-y-2">
-                    {statusList.map((status) => (
-                      <div key={status} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`status-${status}`}
-                          checked={statusPedido.includes(status)}
-                          onCheckedChange={() => handleStatusToggle(status)}
-                        />
-                        <label
-                          htmlFor={`status-${status}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            {!hideStatusFilter && (
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium">Status do Pedido:</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between"
+                    >
+                      {statusPedido.length === 0 
+                        ? "Todos os status" 
+                        : statusPedido.length === 1
+                        ? statusPedido[0]
+                        : `${statusPedido.length} selecionados`
+                      }
+                      <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-3 bg-background z-50" align="start">
+                    <div className="space-y-2">
+                      {statusList.map((status) => (
+                        <div key={status} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`status-${status}`}
+                            checked={statusPedido.includes(status)}
+                            onCheckedChange={() => handleStatusToggle(status)}
+                          />
+                          <label
+                            htmlFor={`status-${status}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {status}
+                          </label>
+                        </div>
+                      ))}
+                      {statusPedido.length > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full mt-2"
+                          onClick={() => {
+                            setStatusPedido([]);
+                            if (date?.from && date?.to) {
+                              const dataInicio = format(date.from, 'yyyy-MM-dd');
+                              const dataFim = format(date.to, 'yyyy-MM-dd');
+                              onFilterChange(dataInicio, dataFim, undefined, tipoCliente !== "todos" ? tipoCliente : undefined);
+                            }
+                          }}
                         >
-                          {status}
-                        </label>
-                      </div>
-                    ))}
-                    {statusPedido.length > 0 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full mt-2"
-                        onClick={() => {
-                          setStatusPedido([]);
-                          if (date?.from && date?.to) {
-                            const dataInicio = format(date.from, 'yyyy-MM-dd');
-                            const dataFim = format(date.to, 'yyyy-MM-dd');
-                            onFilterChange(dataInicio, dataFim, undefined, tipoCliente !== "todos" ? tipoCliente : undefined);
-                          }
-                        }}
-                      >
-                        Limpar seleção
-                      </Button>
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
+                          Limpar seleção
+                        </Button>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
 
             {/* Filtro de Tipo de Cliente */}
             <div className="flex flex-col gap-2">

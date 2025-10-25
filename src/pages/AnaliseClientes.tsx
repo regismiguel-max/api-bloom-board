@@ -1,11 +1,11 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
+import { RankingClientesTable } from "@/components/RankingClientesTable";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
-import { useVendasStatus } from "@/hooks/useVendasStatus";
 import { useMemo, useState } from "react";
-import { Loader2, TrendingUp, MapPin, Users } from "lucide-react";
+import { Loader2, MapPin, Users } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 
@@ -47,7 +47,7 @@ const AnaliseClientes = () => {
     });
   }, [vendas, clientesMap]);
 
-  const statusList = useVendasStatus(vendasEnriquecidas);
+  const statusList = [];
   
   const gruposClientes = useMemo(() => {
     const grupos = new Set<string>();
@@ -63,7 +63,7 @@ const AnaliseClientes = () => {
     setDateFilters({ dataInicio, dataFim, statusPedido, tipoCliente, nomeGrupo });
   };
 
-  // Ranking de clientes por vendas com status OK
+  // Ranking COMPLETO de clientes (não apenas top 10)
   const rankingClientes = useMemo(() => {
     if (!vendasEnriquecidas.length) return [];
 
@@ -105,7 +105,7 @@ const AnaliseClientes = () => {
 
     console.log(`👥 Total de clientes únicos: ${clienteVendas.size}`);
 
-    // Converter para array e ordenar por total
+    // Converter para array e ordenar por total (TODOS os clientes, não apenas top 10)
     const resultado = Array.from(clienteVendas.entries())
       .map(([doc, data]) => ({
         doc,
@@ -114,10 +114,9 @@ const AnaliseClientes = () => {
         uf: data.uf,
         pedidos: data.pedidos
       }))
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 10); // Top 10
+      .sort((a, b) => b.total - a.total);
 
-    console.log(`🏆 Top 10 clientes:`, resultado);
+    console.log(`🏆 Total clientes no ranking: ${resultado.length}`);
     return resultado;
   }, [vendasEnriquecidas]);
 
@@ -168,7 +167,7 @@ const AnaliseClientes = () => {
         </div>
 
         {/* Filtro de Data */}
-        <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} />
+        <DateFilter onFilterChange={handleFilterChange} statusList={[]} gruposClientes={gruposClientes} hideStatusFilter={true} />
 
         {/* Loading overlay */}
         {isLoading && (
@@ -181,7 +180,7 @@ const AnaliseClientes = () => {
         )}
 
         {/* KPIs */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
@@ -189,17 +188,6 @@ const AnaliseClientes = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{clientes.length.toLocaleString('pt-BR')}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Clientes Ativos</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalClientesAtivos.toLocaleString('pt-BR')}</div>
-              <p className="text-xs text-muted-foreground mt-1">Com pedidos finalizados</p>
             </CardContent>
           </Card>
 
@@ -216,43 +204,8 @@ const AnaliseClientes = () => {
 
         {/* Charts */}
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Ranking de Clientes */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Top 10 Clientes (Pedidos OK)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {rankingClientes.length > 0 ? (
-                <div className="space-y-4">
-                  {rankingClientes.map((cliente, index) => (
-                    <div key={cliente.doc} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">
-                          {index + 1}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{cliente.nome}</p>
-                          <p className="text-xs text-muted-foreground">{cliente.uf} • {cliente.pedidos} pedidos</p>
-                        </div>
-                      </div>
-                      <p className="font-bold text-primary whitespace-nowrap ml-2">
-                        {new Intl.NumberFormat('pt-BR', { 
-                          style: 'currency', 
-                          currency: 'BRL',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0
-                        }).format(cliente.total)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted-foreground">
-                  Nenhum dado disponível
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* Ranking de Clientes com Paginação */}
+          <RankingClientesTable clientes={rankingClientes} />
 
           {/* Distribuição por UF */}
           <Card>
