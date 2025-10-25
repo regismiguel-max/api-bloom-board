@@ -15,13 +15,12 @@ const authSchema = z.object({
 });
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
 
   const validateForm = () => {
     try {
@@ -52,15 +51,11 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      const { error: authError } = isLogin 
-        ? await signIn(email, password)
-        : await signUp(email, password);
+      const { error: authError } = await signIn(email, password);
 
       if (authError) {
         if (authError.message.includes('Invalid login credentials')) {
           setError('Email ou senha incorretos');
-        } else if (authError.message.includes('already registered')) {
-          setError('Este email já está cadastrado');
         } else {
           setError(authError.message);
         }
@@ -87,18 +82,16 @@ const Auth = () => {
             <p className="text-sm sm:text-base text-white/80 mt-1">Soluções em Saúde</p>
           </div>
           <p className="text-sm sm:text-base text-white/70">
-            {isLogin ? 'Entre com sua conta' : 'Crie sua conta'}
+            Entre com sua conta
           </p>
         </div>
 
         {/* Card de Login/Cadastro */}
         <Card className="shadow-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-xl sm:text-2xl">{isLogin ? 'Login' : 'Criar Conta'}</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">Login</CardTitle>
             <CardDescription className="text-sm">
-              {isLogin 
-                ? 'Entre com seu email e senha para acessar o sistema' 
-                : 'Preencha os dados abaixo para criar sua conta'}
+              Entre com seu email e senha para acessar o sistema
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -143,40 +136,12 @@ const Auth = () => {
 
               <Button type="submit" className="w-full text-sm sm:text-base h-10 sm:h-11" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isLogin ? 'Entrar' : 'Criar Conta'}
+                Entrar
               </Button>
             </form>
 
-            <div className="mt-4 text-center text-xs sm:text-sm">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError("");
-                  setValidationErrors({});
-                }}
-                className="text-primary hover:underline font-medium transition-colors"
-                disabled={isLoading}
-              >
-                {isLogin 
-                  ? 'Não tem uma conta? Cadastre-se' 
-                  : 'Já tem uma conta? Faça login'}
-              </button>
-            </div>
           </CardContent>
         </Card>
-
-        {/* Instruções para Admin */}
-        {!isLogin && (
-          <Card className="border-primary/20 shadow-md bg-card/95">
-            <CardContent className="pt-4 sm:pt-6">
-              <p className="text-xs sm:text-sm text-muted-foreground text-center leading-relaxed">
-                <strong>Nota:</strong> Novos usuários são criados como "user". 
-                Para ter acesso de admin, entre em contato com o administrador do sistema.
-              </p>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Link para instalação */}
         <Card className="border-primary/20 shadow-md bg-card/95">
