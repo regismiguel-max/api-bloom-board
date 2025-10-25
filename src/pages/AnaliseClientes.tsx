@@ -87,7 +87,7 @@ const AnaliseClientes = () => {
     });
 
     // Agrupar por cliente
-    const clienteVendas = new Map<string, { nome: string; total: number; uf: string; pedidos: number }>();
+    const clienteVendas = new Map<string, { nome: string; total: number; uf: string; pedidos: number; vendedores: Set<string> }>();
 
     pedidosUnicos.forEach((venda) => {
       const clienteDoc = venda.CLIENTE_DOC?.replace(/\D/g, '');
@@ -98,11 +98,15 @@ const AnaliseClientes = () => {
           nome: venda.CLIENTE_NOME || 'Cliente Desconhecido', 
           total: 0,
           uf: venda.CLIENTE_UF || 'N/A',
-          pedidos: 0
+          pedidos: 0,
+          vendedores: new Set<string>()
         };
         
         existing.total += venda.TOTAL_PEDIDO || 0;
         existing.pedidos += 1;
+        if (venda.VENDEDOR_NOME) {
+          existing.vendedores.add(venda.VENDEDOR_NOME);
+        }
         clienteVendas.set(key, existing);
       }
     });
@@ -116,7 +120,8 @@ const AnaliseClientes = () => {
         nome: data.nome,
         total: data.total,
         uf: data.uf,
-        pedidos: data.pedidos
+        pedidos: data.pedidos,
+        vendedor: Array.from(data.vendedores).join(', ') || 'N/A'
       }))
       .sort((a, b) => b.total - a.total);
 

@@ -10,6 +10,7 @@ interface Cliente {
   total: number;
   uf: string;
   pedidos: number;
+  vendedor?: string;
 }
 
 interface RankingClientesTableProps {
@@ -60,6 +61,7 @@ export const RankingClientesTable = ({ clientes }: RankingClientesTableProps) =>
             <TableRow>
               <TableHead className="w-[80px]">Posição</TableHead>
               <TableHead>Cliente</TableHead>
+              <TableHead>Vendedor</TableHead>
               <TableHead>UF</TableHead>
               <TableHead className="text-center">Pedidos</TableHead>
               <TableHead className="text-right">Total</TableHead>
@@ -81,10 +83,11 @@ export const RankingClientesTable = ({ clientes }: RankingClientesTableProps) =>
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">{cliente.nome}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{cliente.vendedor || '-'}</TableCell>
                   <TableCell>{cliente.uf}</TableCell>
                   <TableCell className="text-center">{cliente.pedidos}</TableCell>
                   <TableCell className="text-right font-bold text-primary">
-                    {new Intl.NumberFormat('pt-BR', { 
+                    {new Intl.NumberFormat('pt-BR', {
                       style: 'currency', 
                       currency: 'BRL',
                       minimumFractionDigits: 2
