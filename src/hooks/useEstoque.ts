@@ -21,6 +21,8 @@ interface EstoqueFilters {
   nomeProduto?: string;
   page?: number;
   limit?: number;
+  estoqueMin?: number;
+  estoqueMax?: number;
 }
 
 const fetchEstoque = async (filters?: EstoqueFilters) => {
@@ -36,6 +38,8 @@ const fetchEstoque = async (filters?: EstoqueFilters) => {
   
   if (filters?.codigoProduto) queryParams.append("codigo_produto", filters.codigoProduto);
   if (filters?.nomeProduto) queryParams.append("nome_produto", filters.nomeProduto);
+  if (filters?.estoqueMin !== undefined) queryParams.append("estoque_min", filters.estoqueMin.toString());
+  if (filters?.estoqueMax !== undefined) queryParams.append("estoque_max", filters.estoqueMax.toString());
 
   const { data, error } = await supabase.functions.invoke(
     `api-estoque?${queryParams.toString()}`,

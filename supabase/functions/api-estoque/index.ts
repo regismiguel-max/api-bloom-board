@@ -12,6 +12,8 @@ Deno.serve(async (req) => {
     const limite = url.searchParams.get('limite');
     const codigoProduto = url.searchParams.get('codigo_produto');
     const nomeProduto = url.searchParams.get('nome_produto');
+    const estoqueMin = url.searchParams.get('estoque_min');
+    const estoqueMax = url.searchParams.get('estoque_max');
 
     let apiUrl = `http://24.152.15.254:8000/estoque`;
     const apiParams = new URLSearchParams();
@@ -25,6 +27,8 @@ Deno.serve(async (req) => {
 
     if (codigoProduto) apiParams.append('codigo_produto', codigoProduto);
     if (nomeProduto) apiParams.append('nome_produto', nomeProduto);
+    if (estoqueMin) apiParams.append('estoque_min', estoqueMin);
+    if (estoqueMax) apiParams.append('estoque_max', estoqueMax);
 
     if (apiParams.toString()) {
       apiUrl += `?${apiParams.toString()}`;
@@ -64,6 +68,8 @@ Deno.serve(async (req) => {
       countParams.append('limite', '0');
       if (codigoProduto) countParams.append('codigo_produto', codigoProduto);
       if (nomeProduto) countParams.append('nome_produto', nomeProduto);
+      if (estoqueMin) countParams.append('estoque_min', estoqueMin);
+      if (estoqueMax) countParams.append('estoque_max', estoqueMax);
       countUrl += `?${countParams.toString()}`;
       console.log('Fetching estoque total count from:', countUrl);
       const countRes = await fetch(countUrl, { method: 'GET', headers });

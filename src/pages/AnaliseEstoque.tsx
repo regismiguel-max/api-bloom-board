@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEstoque } from "@/hooks/useEstoque";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Package, AlertTriangle, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Package, AlertTriangle, TrendingUp, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { DashboardNav } from "@/components/DashboardNav";
 import {
   Table,
@@ -14,12 +14,21 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const AnaliseEstoque = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [estoqueMin, setEstoqueMin] = useState<string>("");
+  const [estoqueMax, setEstoqueMax] = useState<string>("");
+  const [appliedFilters, setAppliedFilters] = useState<{ estoqueMin?: number; estoqueMax?: number }>({});
   const itemsPerPage = 20;
   
-  const { data, isLoading } = useEstoque({ page: currentPage, limit: itemsPerPage });
+  const { data, isLoading } = useEstoque({ 
+    page: currentPage, 
+    limit: itemsPerPage,
+    ...appliedFilters
+  });
   const { data: allData } = useEstoque({ page: 1, limit: 0 }); // Busca todos para KPIs
 
   const estoque = data?.estoque || [];
@@ -33,6 +42,21 @@ const AnaliseEstoque = () => {
     const qtd = item.ESTOQUE_ATUAL || 0;
     return qtd > 0 && qtd <= 10;
   }).length;
+
+  const handleApplyFilter = () => {
+    const filters: { estoqueMin?: number; estoqueMax?: number } = {};
+    if (estoqueMin !== "") filters.estoqueMin = Number(estoqueMin);
+    if (estoqueMax !== "") filters.estoqueMax = Number(estoqueMax);
+    setAppliedFilters(filters);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilter = () => {
+    setEstoqueMin("");
+    setEstoqueMax("");
+    setAppliedFilters({});
+    setCurrentPage(1);
+  };
 
   if (isLoading) {
     return (
@@ -55,6 +79,51 @@ const AnaliseEstoque = () => {
       <DashboardNav />
       <div className="flex-1 p-8 ml-0 lg:ml-64">
         <h1 className="text-3xl font-bold mb-8 text-foreground">Análise de Estoque</h1>
+
+        {/* Filtros de Pesquisa */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Filtrar por Intervalo de Estoque
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-4 items-end">
+              <div className="flex-1 min-w-[200px]">
+                <Label htmlFor="estoque-min">Estoque Mínimo</Label>
+                <Input
+                  id="estoque-min"
+                  type="number"
+                  min="0"
+                  placeholder="Ex: 0"
+                  value={estoqueMin}
+                  onChange={(e) => setEstoqueMin(e.target.value)}
+                />
+              </div>
+              <div className="flex-1 min-w-[200px]">
+                <Label htmlFor="estoque-max">Estoque Máximo</Label>
+                <Input
+                  id="estoque-max"
+                  type="number"
+                  min="0"
+                  placeholder="Ex: 100"
+                  value={estoqueMax}
+                  onChange={(e) => setEstoqueMax(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleApplyFilter}>
+                  <Search className="h-4 w-4 mr-2" />
+                  Aplicar
+                </Button>
+                <Button variant="outline" onClick={handleClearFilter}>
+                  Limpar
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
