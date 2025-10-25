@@ -2,13 +2,32 @@ import { DashboardNav } from "@/components/DashboardNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
-import { useMemo } from "react";
-import { Loader2, Users, TrendingUp } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Loader2, Users, TrendingUp, Search } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { format, subMonths } from "date-fns";
 
 const CarteiraClientes = () => {
-  const { data: vendas = [], isLoading } = useVendas();
-  const { data: clientes = [] } = useClientes();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Definir período padrão: últimos 12 meses
+  const dateFilters = useMemo(() => {
+    const dataFim = new Date();
+    const dataInicio = subMonths(dataFim, 12);
+    return {
+      dataInicio: format(dataInicio, 'yyyy-MM-dd'),
+      dataFim: format(dataFim, 'yyyy-MM-dd')
+    };
+  }, []);
+
+  const { data: vendas = [], isLoading: isLoadingVendas } = useVendas(dateFilters);
+  const { data: clientes = [], isLoading: isLoadingClientes } = useClientes();
+  
+  const isLoading = isLoadingVendas || isLoadingClientes;
 
   // Criar mapa de clientes para enriquecer com dados completos
   const clientesMap = useMemo(() => {
@@ -87,15 +106,70 @@ const CarteiraClientes = () => {
     return resultado;
   }, [vendas, clientesMap]);
 
+  // Criar lista de todos os clientes com seus vendedores
+  const todosClientesComVendedor = useMemo(() => {
+    const clientesMap = new Map<string, {
+      doc: string;
+      nome: string;
+      email?: string;
+      telefone?: string;
+      cidade?: string;
+      uf?: string;
+      grupo?: string;
+      vendedores: Set<string>;
+    }>();
+
+    carteiraVendedores.forEach((vendedorData) => {
+      vendedorData.clientes.forEach((cliente) => {
+        if (!clientesMap.has(cliente.doc)) {
+          clientesMap.set(cliente.doc, {
+            ...cliente,
+            vendedores: new Set()
+          });
+        }
+        clientesMap.get(cliente.doc)!.vendedores.add(vendedorData.vendedor);
+      });
+    });
+
+    return Array.from(clientesMap.values()).map(cliente => ({
+      ...cliente,
+      vendedores: Array.from(cliente.vendedores).join(', ')
+    })).sort((a, b) => a.nome.localeCompare(b.nome));
+  }, [carteiraVendedores]);
+
+  // Filtrar clientes pela pesquisa
+  const clientesFiltrados = useMemo(() => {
+    if (!searchTerm.trim()) return todosClientesComVendedor;
+
+    const searchLower = searchTerm.toLowerCase();
+    return todosClientesComVendedor.filter(cliente => 
+      cliente.nome.toLowerCase().includes(searchLower) ||
+      cliente.doc.includes(searchTerm) ||
+      cliente.vendedores.toLowerCase().includes(searchLower) ||
+      cliente.grupo?.toLowerCase().includes(searchLower) ||
+      cliente.cidade?.toLowerCase().includes(searchLower)
+    );
+  }, [todosClientesComVendedor, searchTerm]);
+
+  // Paginação
+  const totalPages = Math.ceil(clientesFiltrados.length / itemsPerPage);
+  const clientesPaginados = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return clientesFiltrados.slice(startIndex, startIndex + itemsPerPage);
+  }, [clientesFiltrados, currentPage]);
+
+  // Reset página quando filtro mudar
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   // Estatísticas gerais
   const estatisticas = useMemo(() => {
     const totalVendedores = carteiraVendedores.length;
-    const totalClientesUnicos = new Set(
-      carteiraVendedores.flatMap(v => v.clientes.map(c => c.doc))
-    ).size;
+    const totalClientesUnicos = todosClientesComVendedor.length;
     
     return { totalVendedores, totalClientesUnicos };
-  }, [carteiraVendedores]);
+  }, [carteiraVendedores, todosClientesComVendedor]);
 
   return (
     <div className="flex min-h-screen">
@@ -141,59 +215,109 @@ const CarteiraClientes = () => {
           </Card>
         </div>
 
-        {/* Lista de Vendedores e seus Clientes */}
-        <div className="space-y-6">
-          {carteiraVendedores.map((vendedorData) => (
-            <Card key={vendedorData.vendedor}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>{vendedorData.vendedor}</span>
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {vendedorData.totalClientes} {vendedorData.totalClientes === 1 ? 'cliente' : 'clientes'}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nome do Cliente</TableHead>
-                        <TableHead>CPF/CNPJ</TableHead>
-                        <TableHead>Grupo</TableHead>
-                        <TableHead>Cidade/UF</TableHead>
-                        <TableHead>Telefone</TableHead>
+        {/* Barra de Pesquisa */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Pesquisar por cliente, vendedor, documento, grupo ou cidade..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tabela de Clientes */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Lista de Clientes</span>
+              <span className="text-sm font-normal text-muted-foreground">
+                {clientesFiltrados.length} {clientesFiltrados.length === 1 ? 'cliente' : 'clientes'}
+                {searchTerm && ` encontrado${clientesFiltrados.length !== 1 ? 's' : ''}`}
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome do Cliente</TableHead>
+                    <TableHead>CPF/CNPJ</TableHead>
+                    <TableHead>Vendedor(es)</TableHead>
+                    <TableHead>Grupo</TableHead>
+                    <TableHead>Cidade/UF</TableHead>
+                    <TableHead>Telefone</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {clientesPaginados.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        {searchTerm ? 'Nenhum cliente encontrado' : 'Nenhum cliente disponível'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    clientesPaginados.map((cliente) => (
+                      <TableRow key={cliente.doc}>
+                        <TableCell className="font-medium">{cliente.nome}</TableCell>
+                        <TableCell className="font-mono text-sm">
+                          {cliente.doc.length === 11 
+                            ? cliente.doc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+                            : cliente.doc.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
+                          }
+                        </TableCell>
+                        <TableCell className="font-medium text-primary">{cliente.vendedores}</TableCell>
+                        <TableCell>{cliente.grupo || '-'}</TableCell>
+                        <TableCell>
+                          {cliente.cidade && cliente.uf 
+                            ? `${cliente.cidade}/${cliente.uf}` 
+                            : '-'
+                          }
+                        </TableCell>
+                        <TableCell className="font-mono text-sm">
+                          {cliente.telefone || '-'}
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {vendedorData.clientes.map((cliente) => (
-                        <TableRow key={cliente.doc}>
-                          <TableCell className="font-medium">{cliente.nome}</TableCell>
-                          <TableCell className="font-mono text-sm">
-                            {cliente.doc.length === 11 
-                              ? cliente.doc.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
-                              : cliente.doc.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
-                            }
-                          </TableCell>
-                          <TableCell>{cliente.grupo || '-'}</TableCell>
-                          <TableCell>
-                            {cliente.cidade && cliente.uf 
-                              ? `${cliente.cidade}/${cliente.uf}` 
-                              : '-'
-                            }
-                          </TableCell>
-                          <TableCell className="font-mono text-sm">
-                            {cliente.telefone || '-'}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Paginação */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4">
+                <div className="text-sm text-muted-foreground">
+                  Página {currentPage} de {totalPages}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Anterior
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Próxima
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
