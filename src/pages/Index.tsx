@@ -1,8 +1,9 @@
 import { DashboardNav } from "@/components/DashboardNav";
+import { PageHeader } from "@/components/PageHeader";
 import { KPICard } from "@/components/KPICard";
 import { DataTable } from "@/components/DataTable";
 import { DateFilter } from "@/components/DateFilter";
-import { DollarSign, Users, ShoppingCart, TrendingUp, Loader2 } from "lucide-react";
+import { DollarSign, Users, ShoppingCart, TrendingUp, Loader2, BarChart3 } from "lucide-react";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useVendasStatus } from "@/hooks/useVendasStatus";
@@ -194,15 +195,15 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
       <DashboardNav />
       
-      <main className="flex-1 lg:ml-64 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Pedido X Venda</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Dados em tempo real da sua operação.</p>
-        </div>
+      <main className="flex-1 lg:ml-64 pt-16 md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
+        <PageHeader 
+          title="Pedido X Venda"
+          description="Análise completa de pedidos e vendas em tempo real"
+          icon={<BarChart3 className="h-6 w-6 text-primary" />}
+        />
 
         {/* Filtro de Data */}
         <DateFilter onFilterChange={handleFilterChange} statusList={statusList} gruposClientes={gruposClientes} />

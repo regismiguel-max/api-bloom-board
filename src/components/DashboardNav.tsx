@@ -23,11 +23,11 @@ export const DashboardNav = () => {
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* Mobile menu button - moved to top bar */}
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 left-4 z-50"
+        className="md:hidden fixed top-3 left-4 z-50 bg-background/80 backdrop-blur-sm border shadow-sm"
         onClick={() => setIsOpen(!isOpen)}
       >
         <Menu className="h-5 w-5" />

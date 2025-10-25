@@ -12,12 +12,12 @@ interface KPICardProps {
 
 export const KPICard = ({ title, value, change, icon: Icon, trend }: KPICardProps) => {
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-border/50 bg-gradient-to-br from-card to-card/50">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-3xl font-bold tracking-tight">{value}</p>
+          <div className="space-y-2 flex-1 min-w-0">
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+            <p className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{value}</p>
             {change !== undefined && (
               <div className="flex items-center gap-1">
                 <span
@@ -32,8 +32,8 @@ export const KPICard = ({ title, value, change, icon: Icon, trend }: KPICardProp
               </div>
             )}
           </div>
-          <div className="rounded-lg bg-primary/10 p-3">
-            <Icon className="h-6 w-6 text-primary" />
+          <div className="rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 p-3 ml-2">
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
         </div>
       </CardContent>

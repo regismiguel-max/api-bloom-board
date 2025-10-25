@@ -1,11 +1,12 @@
 import { DashboardNav } from "@/components/DashboardNav";
+import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Shield, Calendar } from "lucide-react";
+import { Users, Shield, Calendar, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -54,17 +55,15 @@ const Configuracoes = () => {
   const usuariosComuns = usuarios?.filter((u) => u.roles.includes("user")).length || 0;
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
       <DashboardNav />
       
-      <main className="flex-1 lg:ml-64 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">Configurações</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Gerenciamento de usuários e configurações do sistema
-          </p>
-        </div>
+      <main className="flex-1 lg:ml-64 pt-16 md:pt-0 p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 w-full overflow-x-hidden">
+        <PageHeader 
+          title="Configurações"
+          description="Gerenciamento de usuários e configurações do sistema"
+          icon={<Settings className="h-6 w-6 text-primary" />}
+        />
 
         {/* KPIs */}
         <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
