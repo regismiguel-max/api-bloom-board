@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, Eye, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Search, Package, User, DollarSign } from "lucide-react";
 import { useState, useMemo } from "react";
 
 interface OrderItem {
@@ -124,81 +124,119 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="relative">
+        <ScrollArea className="relative w-full">
           <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/80 to-transparent pointer-events-none z-10 md:hidden" />
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto min-w-full">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Pedido</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Total de Itens</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-center">Detalhes</TableHead>
+                  <TableHead className="min-w-[100px]">Pedido</TableHead>
+                  <TableHead className="min-w-[150px]">Cliente</TableHead>
+                  <TableHead className="min-w-[100px]">Valor</TableHead>
+                  <TableHead className="min-w-[80px] text-center">Itens</TableHead>
+                  <TableHead className="min-w-[100px]">Status</TableHead>
+                  <TableHead className="min-w-[80px] text-center sticky right-0 bg-background">Detalhes</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedOrders.map((order) => (
-                  <TableRow key={order.id}>
+                  <TableRow key={order.id} className="hover:bg-muted/50 transition-colors cursor-pointer">
                     <TableCell className="font-medium">{order.id}</TableCell>
-                    <TableCell>{order.customer}</TableCell>
+                    <TableCell className="max-w-[200px] truncate">{order.customer}</TableCell>
                     <TableCell>
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
                       }).format(order.amount)}
                     </TableCell>
-                    <TableCell className="text-center">{order.totalItems}</TableCell>
+                    <TableCell className="text-center font-medium">{order.totalItems}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={getStatusColor(order.status)}>
                         {order.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center sticky right-0 bg-background">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" className="hover:bg-primary/10">
                             <Eye className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Detalhes do Pedido {order.id}</DialogTitle>
+                        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+                          <DialogHeader className="border-b pb-4">
+                            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+                              <Package className="h-6 w-6 text-primary" />
+                              Pedido {order.id}
+                            </DialogTitle>
                           </DialogHeader>
-                          <div className="space-y-4 mt-4">
-                            <div className="grid grid-cols-3 gap-4 pb-4 border-b">
-                              <div>
-                                <p className="text-sm text-muted-foreground">Cliente</p>
-                                <p className="font-medium">{order.customer}</p>
+                          <div className="space-y-6 mt-6">
+                            {/* Informações do pedido em cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-primary/10 rounded-lg">
+                                    <User className="h-5 w-5 text-primary" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-muted-foreground font-medium">Cliente</p>
+                                    <p className="font-semibold text-sm truncate">{order.customer}</p>
+                                  </div>
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-sm text-muted-foreground">Vendedor</p>
-                                <p className="font-medium">{order.vendedor}</p>
+                              <div className="bg-gradient-to-br from-accent/5 to-accent/10 p-4 rounded-lg border border-accent/20">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-accent/10 rounded-lg">
+                                    <User className="h-5 w-5 text-accent-foreground" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-muted-foreground font-medium">Vendedor</p>
+                                    <p className="font-semibold text-sm truncate">{order.vendedor}</p>
+                                  </div>
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-sm text-muted-foreground">Total</p>
-                                <p className="font-medium">
-                                  {new Intl.NumberFormat('pt-BR', { 
-                                    style: 'currency', 
-                                    currency: 'BRL' 
-                                  }).format(order.amount)}
-                                </p>
+                              <div className="bg-gradient-to-br from-success/5 to-success/10 p-4 rounded-lg border border-success/20">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-success/10 rounded-lg">
+                                    <DollarSign className="h-5 w-5 text-success" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-muted-foreground font-medium">Valor Total</p>
+                                    <p className="font-semibold text-lg text-success">
+                                      {new Intl.NumberFormat('pt-BR', { 
+                                        style: 'currency', 
+                                        currency: 'BRL' 
+                                      }).format(order.amount)}
+                                    </p>
+                                  </div>
+                                </div>
                               </div>
                             </div>
+                            
+                            {/* Lista de produtos */}
                             <div>
-                              <h4 className="font-semibold mb-3">Produtos ({order.items.length})</h4>
-                              <div className="space-y-3">
+                              <div className="flex items-center justify-between mb-4">
+                                <h4 className="font-semibold text-lg flex items-center gap-2">
+                                  <Package className="h-5 w-5 text-primary" />
+                                  Produtos
+                                  <Badge variant="secondary" className="ml-2">{order.items.length}</Badge>
+                                </h4>
+                              </div>
+                              <div className="grid gap-3 max-h-[400px] overflow-y-auto pr-2">
                                 {order.items.map((item, idx) => (
-                                  <div key={idx} className="p-3 rounded-lg border bg-card">
-                                    <div className="grid gap-2">
-                                      <div>
-                                        <span className="text-sm text-muted-foreground">Produto: </span>
-                                        <span className="font-medium">{item.produto}</span>
+                                  <div key={idx} className="group p-4 rounded-lg border bg-card hover:shadow-md hover:border-primary/30 transition-all duration-200">
+                                    <div className="flex items-start gap-3">
+                                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                                        {idx + 1}
                                       </div>
-                                      <div>
-                                        <span className="text-sm text-muted-foreground">Marca: </span>
-                                        <span>{item.marca}</span>
+                                      <div className="flex-1 space-y-2 min-w-0">
+                                        <div>
+                                          <span className="text-xs text-muted-foreground uppercase tracking-wide">Produto</span>
+                                          <p className="font-semibold text-foreground break-words">{item.produto}</p>
+                                        </div>
+                                        <div>
+                                          <span className="text-xs text-muted-foreground uppercase tracking-wide">Marca</span>
+                                          <p className="text-sm text-muted-foreground">{item.marca}</p>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
