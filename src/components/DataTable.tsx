@@ -123,45 +123,51 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
           />
         </div>
       </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="relative w-full">
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/80 to-transparent pointer-events-none z-10 md:hidden" />
-          <div className="overflow-x-auto min-w-full">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[100px]">Pedido</TableHead>
-                  <TableHead className="min-w-[150px]">Cliente</TableHead>
-                  <TableHead className="min-w-[100px]">Valor</TableHead>
-                  <TableHead className="min-w-[80px] text-center">Itens</TableHead>
-                  <TableHead className="min-w-[100px]">Status</TableHead>
-                  <TableHead className="min-w-[80px] text-center sticky right-0 bg-background">Detalhes</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedOrders.map((order) => (
-                  <TableRow key={order.id} className="hover:bg-muted/50 transition-colors cursor-pointer">
-                    <TableCell className="font-medium">{order.id}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{order.customer}</TableCell>
-                    <TableCell>
-                      {new Intl.NumberFormat('pt-BR', { 
-                        style: 'currency', 
-                        currency: 'BRL' 
-                      }).format(order.amount)}
-                    </TableCell>
-                    <TableCell className="text-center font-medium">{order.totalItems}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={getStatusColor(order.status)}>
-                        {order.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center sticky right-0 bg-background">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="ghost" size="sm" className="hover:bg-primary/10">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
+      <CardContent className="p-0 relative">
+        {/* Gradiente indicador de scroll - apenas mobile */}
+        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background via-background/60 to-transparent pointer-events-none z-10 md:hidden" />
+        
+        {/* Container com scroll horizontal */}
+        <div className="overflow-x-auto w-full">
+          <Table className="min-w-[800px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[120px]">Pedido</TableHead>
+                <TableHead className="w-[200px]">Cliente</TableHead>
+                <TableHead className="w-[120px]">Valor</TableHead>
+                <TableHead className="w-[100px] text-center">Itens</TableHead>
+                <TableHead className="w-[130px]">Status</TableHead>
+                <TableHead className="w-[100px] text-center sticky right-0 bg-background shadow-[-4px_0_8px_rgba(0,0,0,0.05)]">Detalhes</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedOrders.map((order) => (
+                <TableRow key={order.id} className="hover:bg-muted/50 transition-colors cursor-pointer">
+                  <TableCell className="font-medium w-[120px]">{order.id}</TableCell>
+                  <TableCell className="w-[200px]">
+                    <div className="max-w-[180px] truncate" title={order.customer}>
+                      {order.customer}
+                    </div>
+                  </TableCell>
+                  <TableCell className="w-[120px]">
+                    {new Intl.NumberFormat('pt-BR', { 
+                      style: 'currency', 
+                      currency: 'BRL' 
+                    }).format(order.amount)}
+                  </TableCell>
+                  <TableCell className="text-center font-medium w-[100px]">{order.totalItems}</TableCell>
+                  <TableCell className="w-[130px]">
+                    <Badge variant="outline" className={getStatusColor(order.status)}>
+                      {order.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center w-[100px] sticky right-0 bg-background shadow-[-4px_0_8px_rgba(0,0,0,0.05)]">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="hover:bg-primary/10">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
                         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
                           <DialogHeader className="border-b pb-4">
                             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
@@ -244,19 +250,18 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
                               </div>
                             </div>
                           </div>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  </TableRow>
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
+                </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
-        </ScrollArea>
         
         <div className="px-6 pb-4">
           {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-muted-foreground">
               Mostrando {filteredOrders.length} pedidos
               {totalUnfiltered && totalUnfiltered !== orders.length && (
@@ -290,17 +295,17 @@ export const DataTable = ({ orders, isLoading, totalUnfiltered }: DataTableProps
           )}
           
           {totalPages <= 1 && (
-          <div className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              Total: {filteredOrders.length} pedidos
-              {totalUnfiltered && totalUnfiltered !== orders.length && (
-                <> de {totalUnfiltered}</>
-              )}
-              {orders.length !== filteredOrders.length && orders.length !== totalUnfiltered && (
-                <> | {orders.length} após filtros da página</>
-              )}
-            </p>
-          </div>
+            <div className="mt-4">
+              <p className="text-sm text-muted-foreground">
+                Total: {filteredOrders.length} pedidos
+                {totalUnfiltered && totalUnfiltered !== orders.length && (
+                  <> de {totalUnfiltered}</>
+                )}
+                {orders.length !== filteredOrders.length && orders.length !== totalUnfiltered && (
+                  <> | {orders.length} após filtros da página</>
+                )}
+              </p>
+            </div>
           )}
         </div>
       </CardContent>
