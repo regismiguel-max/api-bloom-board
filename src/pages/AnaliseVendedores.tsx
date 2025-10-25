@@ -24,10 +24,20 @@ const AnaliseVendedores = () => {
   const { data: vendas = [], isLoading } = useVendas(dateFilters);
 
   const statusList = [];
-  const gruposClientes = [];
 
   // Criar mapa de clientes para enriquecer vendas
   const { data: clientes = [] } = useClientes();
+  
+  // Criar lista de grupos de clientes únicos
+  const gruposClientes = useMemo(() => {
+    const grupos = new Set<string>();
+    clientes.forEach((cliente) => {
+      if (cliente.NOME_GRUPO) {
+        grupos.add(cliente.NOME_GRUPO);
+      }
+    });
+    return Array.from(grupos).sort();
+  }, [clientes]);
 
   const clientesMap = useMemo(() => {
     const map = new Map();
