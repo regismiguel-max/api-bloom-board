@@ -6,6 +6,7 @@ import { Package, AlertTriangle, TrendingUp, ChevronLeft, ChevronRight, Search, 
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { RefreshButton } from "@/components/RefreshButton";
 import {
   Table,
   TableBody,
@@ -94,6 +95,7 @@ const AnaliseEstoque = () => {
             title="Análise de Estoque"
             description="Controle completo do estoque de produtos"
             icon={<Box className="h-6 w-6 text-primary" />}
+            action={<RefreshButton queryKeys={["estoque"]} />}
           />
           
           <div className="flex flex-col items-center justify-center py-20">
@@ -112,6 +114,7 @@ const AnaliseEstoque = () => {
           title="Análise de Estoque"
           description="Controle completo do estoque de produtos"
           icon={<Box className="h-6 w-6 text-primary" />}
+          action={<RefreshButton queryKeys={["estoque"]} />}
         />
 
         {/* KPIs */}

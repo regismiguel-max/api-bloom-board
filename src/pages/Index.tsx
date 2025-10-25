@@ -1,6 +1,7 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { RefreshButton } from "@/components/RefreshButton";
 import { KPICard } from "@/components/KPICard";
 import { DataTable } from "@/components/DataTable";
 import { DateFilter } from "@/components/DateFilter";
@@ -204,6 +205,7 @@ const Index = () => {
           title="Pedido X Venda"
           description="Análise completa de pedidos e vendas em tempo real"
           icon={<BarChart3 className="h-6 w-6 text-primary" />}
+          action={<RefreshButton queryKeys={["vendas", "clientes"]} />}
         />
 
         {/* Filtro de Data - Movido para o topo */}

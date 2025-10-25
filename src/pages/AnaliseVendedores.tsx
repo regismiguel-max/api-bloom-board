@@ -1,6 +1,7 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { RefreshButton } from "@/components/RefreshButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { useVendas } from "@/hooks/useVendas";
@@ -202,6 +203,7 @@ const AnaliseVendedores = () => {
           title="Análise de Vendedores"
           description="Performance detalhada e ranking completo dos vendedores"
           icon={<Award className="h-6 w-6 text-primary" />}
+          action={<RefreshButton queryKeys={["vendas", "clientes"]} />}
         />
 
         {/* Filtro de Data */}

@@ -1,6 +1,7 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { RefreshButton } from "@/components/RefreshButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateFilter } from "@/components/DateFilter";
 import { RankingClientesTable } from "@/components/RankingClientesTable";
@@ -228,6 +229,7 @@ const AnaliseClientes = () => {
           title="Análise de Clientes"
           description="Ranking completo e distribuição geográfica dos clientes"
           icon={<TrendingUp className="h-6 w-6 text-primary" />}
+          action={<RefreshButton queryKeys={["vendas", "clientes"]} />}
         />
 
         {/* Filtro de Data */}

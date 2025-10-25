@@ -4,9 +4,10 @@ interface PageHeaderProps {
   title: string;
   description?: string;
   icon?: ReactNode;
+  action?: ReactNode;
 }
 
-export const PageHeader = ({ title, description, icon }: PageHeaderProps) => {
+export const PageHeader = ({ title, description, icon, action }: PageHeaderProps) => {
   return (
     <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background border-b border-border/50 -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8 py-6 mb-6 md:mb-8">
       <div className="flex items-start gap-4">
@@ -25,6 +26,11 @@ export const PageHeader = ({ title, description, icon }: PageHeaderProps) => {
             </p>
           )}
         </div>
+        {action && (
+          <div className="pt-1">
+            {action}
+          </div>
+        )}
       </div>
     </div>
   );

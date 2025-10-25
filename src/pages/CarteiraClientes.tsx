@@ -1,6 +1,7 @@
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { RefreshButton } from "@/components/RefreshButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
@@ -182,6 +183,7 @@ const CarteiraClientes = () => {
           title="Carteira de Clientes"
           description="Visão completa dos clientes atendidos por cada vendedor"
           icon={<Briefcase className="h-6 w-6 text-primary" />}
+          action={<RefreshButton queryKeys={["vendas", "clientes"]} />}
         />
 
         {/* Loading indicator */}
