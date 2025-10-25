@@ -4,10 +4,12 @@ import { DateFilter } from "@/components/DateFilter";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
-import { Loader2, Users, TrendingUp, DollarSign } from "lucide-react";
+import { Loader2, Users, TrendingUp, DollarSign, Eye } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const AnaliseVendedores = () => {
   const [dateFilters, setDateFilters] = useState<{ dataInicio: string; dataFim: string; statusPedido?: string[]; tipoCliente?: string; nomeGrupo?: string; vendedor?: string }>(() => {
@@ -16,6 +18,8 @@ const AnaliseVendedores = () => {
     const dataFim = format(endOfMonth(now), 'yyyy-MM-dd');
     return { dataInicio, dataFim };
   });
+
+  const [selectedVendedor, setSelectedVendedor] = useState<{ nome: string; clientes: Array<{ doc: string; nome: string }> } | null>(null);
 
   const { data: vendas = [], isLoading } = useVendas(dateFilters);
 
@@ -121,23 +125,26 @@ const AnaliseVendedores = () => {
     });
 
     // Agrupar por vendedor
-    const vendedorVendas = new Map<string, { nome: string; total: number; pedidos: number; clientes: Set<string> }>();
+    const vendedorVendas = new Map<string, { nome: string; total: number; pedidos: number; clientes: Set<string>; clientesDetalhes: Map<string, string> }>();
 
     pedidosUnicos.forEach((venda) => {
       const vendedor = venda.VENDEDOR_NOME || 'Vendedor Desconhecido';
       const clienteDoc = venda.CLIENTE_DOC?.replace(/\D/g, '');
+      const clienteNome = venda.CLIENTE_NOME || 'Cliente Desconhecido';
       
       const existing = vendedorVendas.get(vendedor) || { 
         nome: vendedor, 
         total: 0,
         pedidos: 0,
-        clientes: new Set<string>()
+        clientes: new Set<string>(),
+        clientesDetalhes: new Map<string, string>()
       };
       
       existing.total += venda.TOTAL_PEDIDO || 0;
       existing.pedidos += 1;
       if (clienteDoc) {
         existing.clientes.add(clienteDoc);
+        existing.clientesDetalhes.set(clienteDoc, clienteNome);
       }
       vendedorVendas.set(vendedor, existing);
     });
@@ -151,7 +158,8 @@ const AnaliseVendedores = () => {
         total: data.total,
         pedidos: data.pedidos,
         clientes: data.clientes.size,
-        ticketMedio: data.pedidos > 0 ? data.total / data.pedidos : 0
+        ticketMedio: data.pedidos > 0 ? data.total / data.pedidos : 0,
+        clientesDetalhes: Array.from(data.clientesDetalhes.entries()).map(([doc, nomeCliente]) => ({ doc, nome: nomeCliente }))
       }))
       .sort((a, b) => b.total - a.total);
 
@@ -304,6 +312,7 @@ const AnaliseVendedores = () => {
                     <TableHead className="text-center">Clientes</TableHead>
                     <TableHead className="text-right">Ticket Médio</TableHead>
                     <TableHead className="text-right">Total Faturado</TableHead>
+                    <TableHead className="w-[80px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -336,6 +345,15 @@ const AnaliseVendedores = () => {
                           minimumFractionDigits: 2
                         }).format(vendedor.total)}
                       </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedVendedor({ nome: vendedor.nome, clientes: vendedor.clientesDetalhes })}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -343,6 +361,33 @@ const AnaliseVendedores = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Dialog para mostrar clientes do vendedor */}
+        <Dialog open={!!selectedVendedor} onOpenChange={() => setSelectedVendedor(null)}>
+          <DialogContent className="max-w-2xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>Clientes de {selectedVendedor?.nome}</DialogTitle>
+            </DialogHeader>
+            <div className="overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome do Cliente</TableHead>
+                    <TableHead>CPF/CNPJ</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {selectedVendedor?.clientes.map((cliente) => (
+                    <TableRow key={cliente.doc}>
+                      <TableCell className="font-medium">{cliente.nome}</TableCell>
+                      <TableCell className="font-mono text-sm">{cliente.doc}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
