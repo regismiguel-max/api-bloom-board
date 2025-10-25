@@ -5,8 +5,8 @@ import { RankingClientesTable } from "@/components/RankingClientesTable";
 import { useVendas } from "@/hooks/useVendas";
 import { useClientes } from "@/hooks/useClientes";
 import { useMemo, useState } from "react";
-import { Loader2, MapPin, Users } from "lucide-react";
-import { format, startOfMonth, endOfMonth } from "date-fns";
+import { Loader2, MapPin, Users, Calendar, Clock } from "lucide-react";
+import { format, startOfMonth, endOfMonth, differenceInDays, parse } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const AnaliseClientes = () => {
@@ -146,6 +146,68 @@ const AnaliseClientes = () => {
     return clientesComVendas.size;
   }, [vendasEnriquecidas]);
 
+  // Análise de tempo desde última compra
+  const analiseUltimaCompra = useMemo(() => {
+    if (!clientes.length) return { media: 0, distribuicao: [], clientesInativos: 0 };
+
+    const hoje = new Date();
+    const diasDesdeUltimaCompra: number[] = [];
+    let clientesComData = 0;
+    let clientesInativos = 0;
+
+    clientes.forEach((cliente) => {
+      if (cliente.ULTIMA_COMPRA) {
+        try {
+          // Tenta parsear a data no formato DD/MM/YYYY
+          const dataUltimaCompra = parse(cliente.ULTIMA_COMPRA, 'dd/MM/yyyy', new Date());
+          const dias = differenceInDays(hoje, dataUltimaCompra);
+          
+          if (!isNaN(dias) && dias >= 0) {
+            diasDesdeUltimaCompra.push(dias);
+            clientesComData++;
+            
+            // Considera inativo se não compra há mais de 90 dias
+            if (dias > 90) {
+              clientesInativos++;
+            }
+          }
+        } catch (error) {
+          console.warn('Erro ao parsear data:', cliente.ULTIMA_COMPRA);
+        }
+      }
+    });
+
+    const media = clientesComData > 0 
+      ? Math.round(diasDesdeUltimaCompra.reduce((acc, val) => acc + val, 0) / clientesComData)
+      : 0;
+
+    // Criar distribuição por faixas
+    const faixas = {
+      '0-30 dias': 0,
+      '31-60 dias': 0,
+      '61-90 dias': 0,
+      '91-180 dias': 0,
+      '181-365 dias': 0,
+      'Mais de 1 ano': 0,
+    };
+
+    diasDesdeUltimaCompra.forEach((dias) => {
+      if (dias <= 30) faixas['0-30 dias']++;
+      else if (dias <= 60) faixas['31-60 dias']++;
+      else if (dias <= 90) faixas['61-90 dias']++;
+      else if (dias <= 180) faixas['91-180 dias']++;
+      else if (dias <= 365) faixas['181-365 dias']++;
+      else faixas['Mais de 1 ano']++;
+    });
+
+    const distribuicao = Object.entries(faixas).map(([faixa, count]) => ({
+      faixa,
+      count,
+    }));
+
+    return { media, distribuicao, clientesInativos };
+  }, [clientes]);
+
   const COLORS = [
     'hsl(var(--primary))',
     'hsl(var(--secondary))',
@@ -179,7 +241,7 @@ const AnaliseClientes = () => {
         )}
 
         {/* KPIs */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
@@ -199,47 +261,112 @@ const AnaliseClientes = () => {
               <div className="text-2xl font-bold">{distribuicaoPorUF.length}</div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Média Dias Última Compra</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analiseUltimaCompra.media}</div>
+              <p className="text-xs text-muted-foreground mt-1">dias em média</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Clientes Inativos</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analiseUltimaCompra.clientesInativos}</div>
+              <p className="text-xs text-muted-foreground mt-1">+90 dias sem comprar</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Ranking de Clientes */}
         <RankingClientesTable clientes={rankingClientes} />
 
-        {/* Distribuição por Estado */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Distribuição por Estado</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={distribuicaoPorUF}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="uf" 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <Tooltip 
-                  formatter={(value: number) => [value, 'Clientes']}
-                  labelStyle={{ color: 'hsl(var(--foreground))' }}
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--background))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '6px'
-                  }}
-                />
-                <Bar 
-                  dataKey="count" 
-                  fill="hsl(var(--primary))"
-                  radius={[8, 8, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {/* Gráficos em Grid */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Distribuição por Estado */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Distribuição por Estado</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={distribuicaoPorUF}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="uf" 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [value, 'Clientes']}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '6px'
+                    }}
+                  />
+                  <Bar 
+                    dataKey="count" 
+                    fill="hsl(var(--primary))"
+                    radius={[8, 8, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Tempo desde Última Compra */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Tempo desde Última Compra</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={analiseUltimaCompra.distribuicao}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="faixa" 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={11}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [value, 'Clientes']}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '6px'
+                    }}
+                  />
+                  <Bar 
+                    dataKey="count" 
+                    fill="hsl(var(--primary))"
+                    radius={[8, 8, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );

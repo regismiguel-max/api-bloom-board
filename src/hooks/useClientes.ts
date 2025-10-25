@@ -22,6 +22,8 @@ export interface Cliente {
   CEP?: string;
   DATA_CADASTRO?: string;
   ULTIMA_COMPRA?: string;
+  PENULTIMA_COMPRA?: string;
+  TERCEIRA_COMPRA?: string;
   TOTAL_COMPRAS?: number;
   TOTAL_VENDAS?: number;
   [key: string]: any;
