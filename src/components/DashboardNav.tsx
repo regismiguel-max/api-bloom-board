@@ -1,4 +1,4 @@
-import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Menu } from "lucide-react";
+import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Menu, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ const navItems = [
   { icon: TrendingUp, label: "Análise de Clientes", href: "/analise-clientes" },
   { icon: Users, label: "Análise de Vendedores", href: "/analise-vendedores" },
   { icon: ShoppingCart, label: "Análise de Estoque", href: "/analise-estoque" },
+  { icon: Briefcase, label: "Carteira de Clientes", href: "/carteira-clientes" },
   { icon: Settings, label: "Configurações", href: "#" },
 ];
 
