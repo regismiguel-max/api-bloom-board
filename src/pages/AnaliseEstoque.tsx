@@ -25,7 +25,8 @@ const AnaliseEstoque = () => {
   const totalItens = data?.total || 0;
   const totalPages = Math.ceil(totalItens / itemsPerPage);
   
-  const quantidadeTotal = estoque.reduce((acc, item) => acc + (item.ESTOQUE_ATUAL || 0), 0);
+  const produtosSemEstoque = estoque.filter(item => (item.ESTOQUE_ATUAL || 0) === 0).length;
+  const produtosEstoque10 = estoque.filter(item => (item.ESTOQUE_ATUAL || 0) === 10).length;
 
   if (isLoading) {
     return (
@@ -50,7 +51,7 @@ const AnaliseEstoque = () => {
         <h1 className="text-3xl font-bold mb-8 text-foreground">Análise de Estoque</h1>
 
         {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Itens</CardTitle>
@@ -64,14 +65,27 @@ const AnaliseEstoque = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Quantidade Atual</CardTitle>
+              <CardTitle className="text-sm font-medium">Produtos sem Estoque</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-destructive" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-destructive">
+                {produtosSemEstoque}
+              </div>
+              <p className="text-xs text-muted-foreground">produtos nesta página</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Estoque Igual a 10</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {quantidadeTotal.toLocaleString('pt-BR')}
+                {produtosEstoque10}
               </div>
-              <p className="text-xs text-muted-foreground">unidades nesta página</p>
+              <p className="text-xs text-muted-foreground">produtos nesta página</p>
             </CardContent>
           </Card>
         </div>
