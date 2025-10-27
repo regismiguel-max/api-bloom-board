@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import AnaliseClientes from "./pages/AnaliseClientes";
 import AnaliseVendedores from "./pages/AnaliseVendedores";
 import AnaliseEstoque from "./pages/AnaliseEstoque";
+import Cotacao from "./pages/Cotacao";
 import CarteiraClientes from "./pages/CarteiraClientes";
 import Configuracoes from "./pages/Configuracoes";
 import Auth from "./pages/Auth";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/analise-clientes" element={<ProtectedRoute><AnaliseClientes /></ProtectedRoute>} />
             <Route path="/analise-vendedores" element={<ProtectedRoute><AnaliseVendedores /></ProtectedRoute>} />
             <Route path="/analise-estoque" element={<ProtectedRoute><AnaliseEstoque /></ProtectedRoute>} />
+            <Route path="/cotacao" element={<ProtectedRoute><Cotacao /></ProtectedRoute>} />
             <Route path="/carteira-clientes" element={<ProtectedRoute><CarteiraClientes /></ProtectedRoute>} />
             <Route path="/configuracoes" element={<ProtectedRoute><Configuracoes /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
