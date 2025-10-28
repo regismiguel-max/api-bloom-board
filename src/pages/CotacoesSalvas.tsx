@@ -181,92 +181,152 @@ ${cotacao.observacoes ? `*Observações:*\n${cotacao.observacoes}` : ''}`;
                 <p className="text-sm">Crie uma nova cotação na página de cotação</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Número</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead className="text-right">Itens</TableHead>
-                      <TableHead className="text-right">Valor Total</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-center">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {cotacoes.map((cotacao) => (
-                      <TableRow key={cotacao.id}>
-                        <TableCell className="font-mono text-sm">
-                          {cotacao.numero_cotacao}
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(cotacao.data_cotacao), "dd/MM/yyyy")}
-                        </TableCell>
-                        <TableCell>{cotacao.cliente_nome}</TableCell>
-                        <TableCell className="text-right">
-                          {cotacao.quantidade_total}
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          R$ {cotacao.valor_total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                        </TableCell>
-                        <TableCell>
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Número</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead className="text-right">Itens</TableHead>
+                        <TableHead className="text-right">Valor Total</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-center">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {cotacoes.map((cotacao) => (
+                        <TableRow key={cotacao.id}>
+                          <TableCell className="font-mono text-sm">
+                            {cotacao.numero_cotacao}
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(cotacao.data_cotacao), "dd/MM/yyyy")}
+                          </TableCell>
+                          <TableCell>{cotacao.cliente_nome}</TableCell>
+                          <TableCell className="text-right">
+                            {cotacao.quantidade_total}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            R$ {cotacao.valor_total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={cotacao.status === "aberta" ? "default" : "secondary"}
+                            >
+                              {cotacao.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => visualizarCotacao(cotacao)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deletarCotacao(cotacao.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {cotacoes.map((cotacao) => (
+                    <Card key={cotacao.id} className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-mono text-sm font-medium truncate">
+                              {cotacao.numero_cotacao}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(cotacao.data_cotacao), "dd/MM/yyyy")}
+                            </p>
+                          </div>
                           <Badge
                             variant={cotacao.status === "aberta" ? "default" : "secondary"}
+                            className="shrink-0"
                           >
                             {cotacao.status}
                           </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => visualizarCotacao(cotacao)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deletarCotacao(cotacao.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium truncate">{cotacao.cliente_nome}</p>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              {cotacao.quantidade_total} {cotacao.quantidade_total === 1 ? 'item' : 'itens'}
+                            </span>
+                            <span className="font-medium text-success">
+                              R$ {cotacao.valor_total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                            </span>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => visualizarCotacao(cotacao)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Visualizar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deletarCotacao(cotacao.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
 
         {/* Dialog de detalhes da cotação */}
         <Dialog open={dialogDetalhesOpen} onOpenChange={setDialogDetalhesOpen}>
-          <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="text-base sm:text-lg">
                 Detalhes da Cotação - {cotacaoSelecionada?.numero_cotacao}
               </DialogTitle>
             </DialogHeader>
 
             {cotacaoSelecionada && (
               <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Cliente</p>
-                    <p className="font-medium">{cotacaoSelecionada.cliente_nome}</p>
+                    <p className="font-medium text-sm sm:text-base break-words">{cotacaoSelecionada.cliente_nome}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Documento</p>
-                    <p className="font-medium">{cotacaoSelecionada.cliente_doc}</p>
+                    <p className="font-medium text-sm sm:text-base">{cotacaoSelecionada.cliente_doc}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Data</p>
-                    <p className="font-medium">
+                    <p className="font-medium text-sm sm:text-base">
                       {format(new Date(cotacaoSelecionada.data_cotacao), "dd/MM/yyyy HH:mm")}
                     </p>
                   </div>
@@ -281,61 +341,98 @@ ${cotacao.observacoes ? `*Observações:*\n${cotacao.observacoes}` : ''}`;
                 {cotacaoSelecionada.observacoes && (
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Observações</p>
-                    <p className="text-sm bg-muted p-3 rounded-md">
+                    <p className="text-sm bg-muted p-3 rounded-md break-words">
                       {cotacaoSelecionada.observacoes}
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <h3 className="font-semibold mb-3">Itens da Cotação</h3>
+                  <h3 className="font-semibold mb-3 text-sm sm:text-base">Itens da Cotação</h3>
                   {loadingItens ? (
                     <LoadingIndicator message="Carregando itens..." />
                   ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Código</TableHead>
-                          <TableHead>Produto</TableHead>
-                          <TableHead className="text-right">Qtd</TableHead>
-                          <TableHead className="text-right">Valor Unit.</TableHead>
-                          <TableHead className="text-right">Subtotal</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
+                    <>
+                      {/* Desktop Table */}
+                      <div className="hidden sm:block overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Código</TableHead>
+                              <TableHead>Produto</TableHead>
+                              <TableHead className="text-right">Qtd</TableHead>
+                              <TableHead className="text-right">Valor Unit.</TableHead>
+                              <TableHead className="text-right">Subtotal</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {itensCotacao?.map((item) => (
+                              <TableRow key={item.id}>
+                                <TableCell className="font-mono text-sm">
+                                  {item.codigo_produto}
+                                </TableCell>
+                                <TableCell>{item.nome_produto}</TableCell>
+                                <TableCell className="text-right">{item.quantidade}</TableCell>
+                                <TableCell className="text-right">
+                                  R$ {item.valor_unitario.toFixed(2)}
+                                </TableCell>
+                                <TableCell className="text-right font-medium">
+                                  R$ {item.subtotal.toFixed(2)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      {/* Mobile Cards */}
+                      <div className="sm:hidden space-y-3">
                         {itensCotacao?.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell className="font-mono text-sm">
-                              {item.codigo_produto}
-                            </TableCell>
-                            <TableCell>{item.nome_produto}</TableCell>
-                            <TableCell className="text-right">{item.quantidade}</TableCell>
-                            <TableCell className="text-right">
-                              R$ {item.valor_unitario.toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right font-medium">
-                              R$ {item.subtotal.toFixed(2)}
-                            </TableCell>
-                          </TableRow>
+                          <Card key={item.id} className="p-3">
+                            <div className="space-y-2">
+                              <div>
+                                <p className="font-medium text-sm truncate">{item.nome_produto}</p>
+                                <p className="text-xs text-muted-foreground font-mono">
+                                  {item.codigo_produto}
+                                </p>
+                              </div>
+                              <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div>
+                                  <p className="text-muted-foreground">Qtd</p>
+                                  <p className="font-medium">{item.quantidade}</p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">Unit.</p>
+                                  <p className="font-medium">R$ {item.valor_unitario.toFixed(2)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">Total</p>
+                                  <p className="font-medium text-success">R$ {item.subtotal.toFixed(2)}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
                         ))}
-                      </TableBody>
-                    </Table>
+                      </div>
+                    </>
                   )}
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t">
                   <div>
                     <p className="text-sm text-muted-foreground">Total</p>
-                    <p className="text-2xl font-bold text-success">
+                    <p className="text-xl sm:text-2xl font-bold text-success">
                       R$ {cotacaoSelecionada.valor_total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                   <Button
                     onClick={() => compartilharWhatsApp(cotacaoSelecionada, itensCotacao || [])}
                     disabled={!itensCotacao || itensCotacao.length === 0}
+                    className="w-full sm:w-auto"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
-                    Compartilhar no WhatsApp
+                    <span className="hidden sm:inline">Compartilhar no WhatsApp</span>
+                    <span className="sm:hidden">WhatsApp</span>
                   </Button>
                 </div>
               </div>
