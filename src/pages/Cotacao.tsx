@@ -246,58 +246,103 @@ Valor Total: R$ ${valorTotal.toFixed(2)}
                       Adicionar Produto à Cotação
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+                  <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                       <DialogTitle>Selecionar Produto</DialogTitle>
                     </DialogHeader>
-                    <div className="flex-1 overflow-y-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Código</TableHead>
-                            <TableHead>Produto</TableHead>
-                            <TableHead className="text-right">Estoque</TableHead>
-                            <TableHead className="text-right">Valor</TableHead>
-                            <TableHead className="text-center">Ação</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {produtosFiltrados.length > 0 ? (
-                            produtosFiltrados.slice(0, 50).map((item, index) => (
-                              <TableRow key={index}>
-                                <TableCell className="font-mono text-sm">
-                                  {item.CODIGO_PRO}
+                    <div className="flex-1 overflow-x-auto overflow-y-auto">
+                      {/* Desktop Table */}
+                      <div className="hidden md:block">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Código</TableHead>
+                              <TableHead>Produto</TableHead>
+                              <TableHead className="text-right">Estoque</TableHead>
+                              <TableHead className="text-right">Valor</TableHead>
+                              <TableHead className="text-center">Ação</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {produtosFiltrados.length > 0 ? (
+                              produtosFiltrados.slice(0, 50).map((item, index) => (
+                                <TableRow key={index}>
+                                  <TableCell className="font-mono text-sm">
+                                    {item.CODIGO_PRO}
+                                  </TableCell>
+                                  <TableCell className="font-medium">
+                                    {item.NOME_PRODUTO}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Badge variant={(item.ESTOQUE_ATUAL || 0) > 0 ? "default" : "destructive"}>
+                                      {item.ESTOQUE_ATUAL || 0}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    R$ {(item.VALOR_UNITARIO || 0).toFixed(2)}
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => adicionarItem(item)}
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                                  Nenhum produto encontrado
                                 </TableCell>
-                                <TableCell className="font-medium">
-                                  {item.NOME_PRODUTO}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  <Badge variant={(item.ESTOQUE_ATUAL || 0) > 0 ? "default" : "destructive"}>
-                                    {item.ESTOQUE_ATUAL || 0}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  R$ {(item.VALOR_UNITARIO || 0).toFixed(2)}
-                                </TableCell>
-                                <TableCell className="text-center">
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      {/* Mobile Card List */}
+                      <div className="md:hidden space-y-3">
+                        {produtosFiltrados.length > 0 ? (
+                          produtosFiltrados.slice(0, 50).map((item, index) => (
+                            <Card key={index} className="p-4">
+                              <div className="space-y-2">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm truncate">{item.NOME_PRODUTO}</p>
+                                    <p className="text-xs text-muted-foreground font-mono">
+                                      {item.CODIGO_PRO}
+                                    </p>
+                                  </div>
                                   <Button
                                     size="sm"
                                     onClick={() => adicionarItem(item)}
+                                    className="shrink-0"
                                   >
                                     <Plus className="h-4 w-4" />
                                   </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          ) : (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                Nenhum produto encontrado
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableBody>
-                      </Table>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-muted-foreground">Estoque:</span>
+                                    <Badge variant={(item.ESTOQUE_ATUAL || 0) > 0 ? "default" : "destructive"} className="text-xs">
+                                      {item.ESTOQUE_ATUAL || 0}
+                                    </Badge>
+                                  </div>
+                                  <div className="font-medium">
+                                    R$ {(item.VALOR_UNITARIO || 0).toFixed(2)}
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          ))
+                        ) : (
+                          <div className="text-center text-muted-foreground py-8">
+                            Nenhum produto encontrado
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>
@@ -335,12 +380,12 @@ Valor Total: R$ ${valorTotal.toFixed(2)}
                 <div className="space-y-4">
                   {itensCotacao.map((item) => (
                     <Card key={item.CODIGO_PRO}>
-                      <CardContent className="pt-6">
+                      <CardContent className="pt-4 sm:pt-6">
                         <div className="space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium">{item.NOME_PRODUTO}</p>
-                              <p className="text-sm text-muted-foreground">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm sm:text-base">{item.NOME_PRODUTO}</p>
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 Código: {item.CODIGO_PRO}
                               </p>
                             </div>
@@ -348,14 +393,15 @@ Valor Total: R$ ${valorTotal.toFixed(2)}
                               variant="ghost"
                               size="sm"
                               onClick={() => removerItem(item.CODIGO_PRO || "")}
+                              className="shrink-0"
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </div>
                           
-                          <div className="flex items-center gap-4">
-                            <div className="flex-1">
-                              <Label htmlFor={`qtd-${item.CODIGO_PRO}`}>Quantidade</Label>
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                            <div className="flex-1 w-full sm:w-auto">
+                              <Label htmlFor={`qtd-${item.CODIGO_PRO}`} className="text-xs sm:text-sm">Quantidade</Label>
                               <Input
                                 id={`qtd-${item.CODIGO_PRO}`}
                                 type="number"
@@ -367,11 +413,12 @@ Valor Total: R$ ${valorTotal.toFixed(2)}
                                     parseInt(e.target.value) || 1
                                   )
                                 }
+                                className="text-sm sm:text-base"
                               />
                             </div>
-                            <div className="flex-1">
-                              <Label>Subtotal</Label>
-                              <p className="text-lg font-bold text-success">
+                            <div className="flex-1 w-full sm:w-auto">
+                              <Label className="text-xs sm:text-sm">Subtotal</Label>
+                              <p className="text-base sm:text-lg font-bold text-success">
                                 R$ {item.subtotal.toFixed(2)}
                               </p>
                             </div>
@@ -381,14 +428,15 @@ Valor Total: R$ ${valorTotal.toFixed(2)}
                     </Card>
                   ))}
 
-                  <div className="flex gap-2 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-2 pt-4">
                     <Button
                       className="flex-1"
                       onClick={exportarCotacao}
                       disabled={itensCotacao.length === 0}
                     >
                       <FileText className="h-4 w-4 mr-2" />
-                      Exportar Cotação
+                      <span className="hidden sm:inline">Exportar Cotação</span>
+                      <span className="sm:hidden">Exportar</span>
                     </Button>
                   </div>
                 </div>
