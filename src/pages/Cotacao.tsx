@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useEstoque, ItemEstoque } from "@/hooks/useEstoque";
+import { ItemEstoque } from "@/hooks/useEstoque";
+import { useEstoqueComValores } from "@/hooks/useEstoqueComValores";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Plus, Trash2, Search, ShoppingCart, Share2 } from "lucide-react";
 import { DashboardNav } from "@/components/DashboardNav";
@@ -38,7 +39,7 @@ const Cotacao = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const { data, isLoading } = useEstoque({ page: 1, limit: 0 });
+  const { data, isLoading } = useEstoqueComValores({ page: 1, limit: 0 });
   const estoque = data?.estoque || [];
 
   // Filtrar produtos baseado na pesquisa
