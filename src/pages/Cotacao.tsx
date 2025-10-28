@@ -45,6 +45,7 @@ interface ItemCotacao extends ItemEstoque {
 
 const Cotacao = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchCliente, setSearchCliente] = useState("");
   const [itensCotacao, setItensCotacao] = useState<ItemCotacao[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [clienteSelecionado, setClienteSelecionado] = useState<string>("");
@@ -55,6 +56,14 @@ const Cotacao = () => {
   const { data, isLoading } = useEstoqueComValores({ page: 1, limit: 0 });
   const { data: clientes, isLoading: loadingClientes } = useClientes();
   const estoque = data?.estoque || [];
+
+  // Filtrar clientes baseado na pesquisa
+  const clientesFiltrados = clientes?.filter(cliente => {
+    const termo = searchCliente.toLowerCase();
+    const nome = (cliente.NOME_CLIENTE || cliente.NOME || '').toLowerCase();
+    const doc = (cliente.CPF_CNPJ || '').toLowerCase();
+    return nome.includes(termo) || doc.includes(termo);
+  }) || [];
 
   // Filtrar produtos baseado na pesquisa
   const produtosFiltrados = estoque.filter(item => {
@@ -372,9 +381,20 @@ ${itensCotacao.map((item, i) =>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="cliente">Cliente *</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Pesquisar cliente..."
+                      value={searchCliente}
+                      onChange={(e) => setSearchCliente(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
                 <Select 
                   value={clienteSelecionado} 
                   onValueChange={setClienteSelecionado}
@@ -383,15 +403,21 @@ ${itensCotacao.map((item, i) =>
                   <SelectTrigger id="cliente">
                     <SelectValue placeholder="Selecione um cliente" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {clientes?.map((cliente) => (
-                      <SelectItem 
-                        key={cliente.CODIGO_CLIENTE || cliente.CPF_CNPJ} 
-                        value={cliente.CODIGO_CLIENTE?.toString() || cliente.CPF_CNPJ || ''}
-                      >
-                        {cliente.NOME_CLIENTE || cliente.NOME || 'Sem nome'} - {cliente.CPF_CNPJ}
-                      </SelectItem>
-                    ))}
+                  <SelectContent className="max-h-[300px]">
+                    {clientesFiltrados.length === 0 ? (
+                      <div className="p-2 text-sm text-muted-foreground text-center">
+                        Nenhum cliente encontrado
+                      </div>
+                    ) : (
+                      clientesFiltrados.map((cliente) => (
+                        <SelectItem 
+                          key={cliente.CODIGO_CLIENTE || cliente.CPF_CNPJ} 
+                          value={cliente.CODIGO_CLIENTE?.toString() || cliente.CPF_CNPJ || ''}
+                        >
+                          {cliente.NOME_CLIENTE || cliente.NOME || 'Sem nome'} - {cliente.CPF_CNPJ}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -408,7 +434,7 @@ ${itensCotacao.map((item, i) =>
               </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-2 border-t">
               <Button
                 onClick={salvarCotacao}
                 disabled={salvando || itensCotacao.length === 0 || !clienteSelecionado}
