@@ -37,14 +37,14 @@ const fetchEstoqueComValores = async (filters?: EstoqueComValoresFilters) => {
     throw new Error(`Failed to fetch estoque: ${estoqueError.message}`);
   }
 
-  // Buscar vendas recentes para pegar valores
+  // Buscar vendas recentes para pegar valores (últimos 90 dias)
   const hoje = new Date();
-  const trintaDiasAtras = new Date(hoje);
-  trintaDiasAtras.setDate(hoje.getDate() - 30);
+  const noventaDiasAtras = new Date(hoje);
+  noventaDiasAtras.setDate(hoje.getDate() - 90);
 
   const vendasParams = new URLSearchParams({
     limite: "0",
-    data_inicio: trintaDiasAtras.toISOString().split('T')[0],
+    data_inicio: noventaDiasAtras.toISOString().split('T')[0],
     data_fim: hoje.toISOString().split('T')[0],
   });
 
