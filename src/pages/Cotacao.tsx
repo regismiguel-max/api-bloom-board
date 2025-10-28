@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEstoque, ItemEstoque } from "@/hooks/useEstoque";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Plus, Trash2, Search, ShoppingCart } from "lucide-react";
+import { FileText, Plus, Trash2, Search, ShoppingCart, Share2 } from "lucide-react";
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
@@ -147,6 +147,31 @@ Valor Total: R$ ${valorTotal.toFixed(2)}
     toast({
       title: "Cotação exportada",
       description: "Arquivo de cotação baixado com sucesso.",
+    });
+  };
+
+  // Compartilhar via WhatsApp
+  const compartilharWhatsApp = () => {
+    const texto = `*COTAÇÃO - ${new Date().toLocaleDateString('pt-BR')}*
+
+*Itens:*
+${itensCotacao.map((item, i) => 
+  `${i + 1}. *${item.NOME_PRODUTO}*
+   Código: ${item.CODIGO_PRO}
+   Quantidade: ${item.quantidade}
+   Valor Unit.: R$ ${(item.VALOR_UNITARIO || 0).toFixed(2)}
+   Subtotal: R$ ${item.subtotal.toFixed(2)}`
+).join('\n\n')}
+
+*Total de Itens:* ${quantidadeTotal}
+*Valor Total:* R$ ${valorTotal.toFixed(2)}`;
+
+    const mensagemEncoded = encodeURIComponent(texto);
+    window.open(`https://wa.me/?text=${mensagemEncoded}`, '_blank');
+    
+    toast({
+      title: "Abrindo WhatsApp",
+      description: "Compartilhe a cotação com seus contatos.",
     });
   };
 
@@ -437,6 +462,16 @@ Valor Total: R$ ${valorTotal.toFixed(2)}
                       <FileText className="h-4 w-4 mr-2" />
                       <span className="hidden sm:inline">Exportar Cotação</span>
                       <span className="sm:hidden">Exportar</span>
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      variant="secondary"
+                      onClick={compartilharWhatsApp}
+                      disabled={itensCotacao.length === 0}
+                    >
+                      <Share2 className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Compartilhar no WhatsApp</span>
+                      <span className="sm:hidden">WhatsApp</span>
                     </Button>
                   </div>
                 </div>
