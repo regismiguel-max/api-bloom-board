@@ -454,9 +454,9 @@ ${itensCotacao.map((item, i) =>
                     </Card>
                   ))}
 
-                  <div className="flex flex-col sm:flex-row gap-2 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
                     <Button
-                      className="flex-1"
+                      className="w-full sm:flex-1"
                       onClick={exportarCotacao}
                       disabled={itensCotacao.length === 0}
                     >
@@ -465,7 +465,7 @@ ${itensCotacao.map((item, i) =>
                       <span className="sm:hidden">Exportar</span>
                     </Button>
                     <Button
-                      className="flex-1"
+                      className="w-full sm:flex-1"
                       variant="secondary"
                       onClick={compartilharWhatsApp}
                       disabled={itensCotacao.length === 0}
