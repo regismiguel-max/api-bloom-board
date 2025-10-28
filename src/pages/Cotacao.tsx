@@ -372,82 +372,7 @@ ${itensCotacao.map((item, i) =>
           </Card>
         </div>
 
-        {/* Dados da Cotação */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Dados da Cotação
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="cliente">Cliente *</Label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Pesquisar cliente..."
-                      value={searchCliente}
-                      onChange={(e) => setSearchCliente(e.target.value)}
-                      className="pl-9"
-                    />
-                  </div>
-                </div>
-                <Select 
-                  value={clienteSelecionado} 
-                  onValueChange={setClienteSelecionado}
-                  disabled={loadingClientes}
-                >
-                  <SelectTrigger id="cliente">
-                    <SelectValue placeholder="Selecione um cliente" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {clientesFiltrados.length === 0 ? (
-                      <div className="p-2 text-sm text-muted-foreground text-center">
-                        Nenhum cliente encontrado
-                      </div>
-                    ) : (
-                      clientesFiltrados.map((cliente) => (
-                        <SelectItem 
-                          key={cliente.CODIGO_CLIENTE || cliente.CPF_CNPJ} 
-                          value={cliente.CODIGO_CLIENTE?.toString() || cliente.CPF_CNPJ || ''}
-                        >
-                          {cliente.NOME_CLIENTE || cliente.NOME || 'Sem nome'} - {cliente.CPF_CNPJ}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="observacoes">Observações</Label>
-                <Textarea
-                  id="observacoes"
-                  placeholder="Observações sobre a cotação..."
-                  value={observacoes}
-                  onChange={(e) => setObservacoes(e.target.value)}
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-2 border-t">
-              <Button
-                onClick={salvarCotacao}
-                disabled={salvando || itensCotacao.length === 0 || !clienteSelecionado}
-                className="gap-2"
-              >
-                <Save className="h-4 w-4" />
-                {salvando ? "Salvando..." : "Salvar Cotação"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Lista de Produtos para Adicionar */}
           <Card>
             <CardHeader>
@@ -683,6 +608,86 @@ ${itensCotacao.map((item, i) =>
             </CardContent>
           </Card>
         </div>
+
+        {/* Dados da Cotação - Seção Final */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Finalizar Cotação
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="cliente">Cliente *</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                  <Input
+                    placeholder="Pesquisar cliente..."
+                    value={searchCliente}
+                    onChange={(e) => setSearchCliente(e.target.value)}
+                    className="pl-9 mb-2"
+                  />
+                </div>
+                <Select 
+                  value={clienteSelecionado} 
+                  onValueChange={setClienteSelecionado}
+                  disabled={loadingClientes}
+                >
+                  <SelectTrigger id="cliente">
+                    <SelectValue placeholder="Selecione um cliente" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px] bg-background">
+                    {clientesFiltrados.length === 0 ? (
+                      <div className="p-2 text-sm text-muted-foreground text-center">
+                        Nenhum cliente encontrado
+                      </div>
+                    ) : (
+                      clientesFiltrados.map((cliente) => (
+                        <SelectItem 
+                          key={cliente.CODIGO_CLIENTE || cliente.CPF_CNPJ} 
+                          value={cliente.CODIGO_CLIENTE?.toString() || cliente.CPF_CNPJ || ''}
+                        >
+                          {cliente.NOME_CLIENTE || cliente.NOME || 'Sem nome'} - {cliente.CPF_CNPJ}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="observacoes">Observações</Label>
+                <Textarea
+                  id="observacoes"
+                  placeholder="Observações sobre a cotação..."
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t">
+              <div>
+                <p className="text-sm text-muted-foreground">Valor Total da Cotação</p>
+                <p className="text-2xl sm:text-3xl font-bold text-success">
+                  R$ {valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              <Button
+                onClick={salvarCotacao}
+                disabled={salvando || itensCotacao.length === 0 || !clienteSelecionado}
+                className="w-full sm:w-auto gap-2"
+                size="lg"
+              >
+                <Save className="h-5 w-5" />
+                {salvando ? "Salvando..." : "Salvar Cotação"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
