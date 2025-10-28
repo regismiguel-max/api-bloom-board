@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      cotacao_itens: {
+        Row: {
+          codigo_produto: string
+          cotacao_id: string
+          created_at: string
+          id: string
+          nome_produto: string
+          quantidade: number
+          subtotal: number
+          valor_unitario: number
+        }
+        Insert: {
+          codigo_produto: string
+          cotacao_id: string
+          created_at?: string
+          id?: string
+          nome_produto: string
+          quantidade: number
+          subtotal: number
+          valor_unitario: number
+        }
+        Update: {
+          codigo_produto?: string
+          cotacao_id?: string
+          created_at?: string
+          id?: string
+          nome_produto?: string
+          quantidade?: number
+          subtotal?: number
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cotacao_itens_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cotacoes: {
+        Row: {
+          cliente_codigo: string | null
+          cliente_doc: string | null
+          cliente_nome: string
+          created_at: string
+          data_cotacao: string
+          id: string
+          numero_cotacao: string
+          observacoes: string | null
+          quantidade_total: number
+          status: string
+          updated_at: string
+          user_id: string
+          valor_total: number
+        }
+        Insert: {
+          cliente_codigo?: string | null
+          cliente_doc?: string | null
+          cliente_nome: string
+          created_at?: string
+          data_cotacao?: string
+          id?: string
+          numero_cotacao: string
+          observacoes?: string | null
+          quantidade_total?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          valor_total?: number
+        }
+        Update: {
+          cliente_codigo?: string | null
+          cliente_doc?: string | null
+          cliente_nome?: string
+          created_at?: string
+          data_cotacao?: string
+          id?: string
+          numero_cotacao?: string
+          observacoes?: string | null
+          quantidade_total?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valor_total?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

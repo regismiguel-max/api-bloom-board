@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { ItemEstoque } from "@/hooks/useEstoque";
 import { useEstoqueComValores } from "@/hooks/useEstoqueComValores";
+import { useClientes } from "@/hooks/useClientes";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Plus, Trash2, Search, ShoppingCart, Share2 } from "lucide-react";
+import { FileText, Plus, Trash2, Search, ShoppingCart, Share2, Save, Users } from "lucide-react";
 import { DashboardNav } from "@/components/DashboardNav";
 import { PageHeader } from "@/components/PageHeader";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
@@ -10,6 +12,14 @@ import { RefreshButton } from "@/components/RefreshButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -37,9 +47,13 @@ const Cotacao = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [itensCotacao, setItensCotacao] = useState<ItemCotacao[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [clienteSelecionado, setClienteSelecionado] = useState<string>("");
+  const [observacoes, setObservacoes] = useState("");
+  const [salvando, setSalvando] = useState(false);
   const { toast } = useToast();
 
   const { data, isLoading } = useEstoqueComValores({ page: 1, limit: 0 });
+  const { data: clientes, isLoading: loadingClientes } = useClientes();
   const estoque = data?.estoque || [];
 
   // Filtrar produtos baseado na pesquisa
@@ -176,6 +190,111 @@ ${itensCotacao.map((item, i) =>
     });
   };
 
+  // Salvar cotação no banco de dados
+  const salvarCotacao = async () => {
+    if (!clienteSelecionado) {
+      toast({
+        title: "Cliente não selecionado",
+        description: "Por favor, selecione um cliente para a cotação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (itensCotacao.length === 0) {
+      toast({
+        title: "Cotação vazia",
+        description: "Adicione pelo menos um item à cotação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSalvando(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Erro de autenticação",
+          description: "Você precisa estar logado para salvar cotações.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const cliente = clientes?.find(c => 
+        c.CODIGO_CLIENTE?.toString() === clienteSelecionado ||
+        c.CPF_CNPJ === clienteSelecionado
+      );
+
+      // Gerar número da cotação
+      const numeroCotacao = `COT-${Date.now()}`;
+
+      // Inserir cotação
+      const { data: cotacao, error: errorCotacao } = await supabase
+        .from('cotacoes')
+        .insert({
+          user_id: user.id,
+          cliente_nome: cliente?.NOME_CLIENTE || cliente?.NOME || 'Cliente não identificado',
+          cliente_doc: cliente?.CPF_CNPJ || '',
+          cliente_codigo: cliente?.CODIGO_CLIENTE?.toString() || '',
+          numero_cotacao: numeroCotacao,
+          valor_total: valorTotal,
+          quantidade_total: quantidadeTotal,
+          observacoes: observacoes || null,
+          status: 'aberta'
+        })
+        .select()
+        .single();
+
+      if (errorCotacao) {
+        console.error('Erro ao salvar cotação:', errorCotacao);
+        throw errorCotacao;
+      }
+
+      // Inserir itens da cotação
+      const itensParaInserir = itensCotacao.map(item => ({
+        cotacao_id: cotacao.id,
+        codigo_produto: item.CODIGO_PRO || '',
+        nome_produto: item.NOME_PRODUTO || '',
+        quantidade: item.quantidade,
+        valor_unitario: item.VALOR_UNITARIO || 0,
+        subtotal: item.subtotal
+      }));
+
+      const { error: errorItens } = await supabase
+        .from('cotacao_itens')
+        .insert(itensParaInserir);
+
+      if (errorItens) {
+        console.error('Erro ao salvar itens:', errorItens);
+        throw errorItens;
+      }
+
+      toast({
+        title: "Cotação salva com sucesso!",
+        description: `Número da cotação: ${numeroCotacao}`,
+      });
+
+      // Limpar formulário
+      setItensCotacao([]);
+      setClienteSelecionado("");
+      setObservacoes("");
+
+    } catch (error) {
+      console.error('Erro ao salvar cotação:', error);
+      toast({
+        title: "Erro ao salvar cotação",
+        description: "Ocorreu um erro ao salvar a cotação. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setSalvando(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen bg-background">
@@ -207,7 +326,7 @@ ${itensCotacao.map((item, i) =>
         />
 
         {/* Resumo da Cotação */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Itens na Cotação</CardTitle>
@@ -243,6 +362,64 @@ ${itensCotacao.map((item, i) =>
             </CardContent>
           </Card>
         </div>
+
+        {/* Dados da Cotação */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Dados da Cotação
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cliente">Cliente *</Label>
+                <Select 
+                  value={clienteSelecionado} 
+                  onValueChange={setClienteSelecionado}
+                  disabled={loadingClientes}
+                >
+                  <SelectTrigger id="cliente">
+                    <SelectValue placeholder="Selecione um cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientes?.map((cliente) => (
+                      <SelectItem 
+                        key={cliente.CODIGO_CLIENTE || cliente.CPF_CNPJ} 
+                        value={cliente.CODIGO_CLIENTE?.toString() || cliente.CPF_CNPJ || ''}
+                      >
+                        {cliente.NOME_CLIENTE || cliente.NOME || 'Sem nome'} - {cliente.CPF_CNPJ}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="observacoes">Observações</Label>
+                <Textarea
+                  id="observacoes"
+                  placeholder="Observações sobre a cotação..."
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={salvarCotacao}
+                disabled={salvando || itensCotacao.length === 0 || !clienteSelecionado}
+                className="gap-2"
+              >
+                <Save className="h-4 w-4" />
+                {salvando ? "Salvando..." : "Salvar Cotação"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Lista de Produtos para Adicionar */}

@@ -1,4 +1,4 @@
-import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Briefcase, LogOut, FileText, Mail } from "lucide-react";
+import { BarChart3, Users, ShoppingCart, TrendingUp, Settings, Briefcase, LogOut, FileText, Mail, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ const navItems = [
   { icon: Users, label: "Análise de Vendedores", href: "/analise-vendedores" },
   { icon: ShoppingCart, label: "Análise de Estoque", href: "/analise-estoque" },
   { icon: FileText, label: "Cotação", href: "/cotacao" },
+  { icon: FolderOpen, label: "Cotações Salvas", href: "/cotacoes-salvas" },
   { icon: Mail, label: "Disparo de E-mails", href: "/disparo-emails" },
   { icon: Briefcase, label: "Carteira de Clientes", href: "/carteira-clientes" },
   { icon: Settings, label: "Configurações", href: "/configuracoes" },

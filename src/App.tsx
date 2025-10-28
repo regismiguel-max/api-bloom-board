@@ -10,6 +10,7 @@ import AnaliseClientes from "./pages/AnaliseClientes";
 import AnaliseVendedores from "./pages/AnaliseVendedores";
 import AnaliseEstoque from "./pages/AnaliseEstoque";
 import Cotacao from "./pages/Cotacao";
+import CotacoesSalvas from "./pages/CotacoesSalvas";
 import DisparoEmails from "./pages/DisparoEmails";
 import CarteiraClientes from "./pages/CarteiraClientes";
 import Configuracoes from "./pages/Configuracoes";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/analise-vendedores" element={<ProtectedRoute><AnaliseVendedores /></ProtectedRoute>} />
             <Route path="/analise-estoque" element={<ProtectedRoute><AnaliseEstoque /></ProtectedRoute>} />
             <Route path="/cotacao" element={<ProtectedRoute><Cotacao /></ProtectedRoute>} />
+            <Route path="/cotacoes-salvas" element={<ProtectedRoute><CotacoesSalvas /></ProtectedRoute>} />
             <Route path="/disparo-emails" element={<ProtectedRoute><DisparoEmails /></ProtectedRoute>} />
             <Route path="/carteira-clientes" element={<ProtectedRoute><CarteiraClientes /></ProtectedRoute>} />
             <Route path="/configuracoes" element={<ProtectedRoute><Configuracoes /></ProtectedRoute>} />
